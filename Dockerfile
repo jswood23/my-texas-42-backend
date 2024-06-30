@@ -17,6 +17,3 @@ EXPOSE 8080
 
 # Run
 CMD [ "/my-texas-42-backend" ]
-
-#go build my-texas-42-backend
-#127.0.0.1 5432 mytexas42-staging postgres \"+WYk.dRb/B4Vp`P f4yjqDCa7eze
