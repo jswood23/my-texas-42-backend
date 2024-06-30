@@ -12,24 +12,28 @@ var dbPort = ""
 var dbName = ""
 var dbUsername = ""
 var dbPassword = ""
-var authSecretKey = ""
+var environment = ""
+var missingEnvVarsMessage = "one or more environment variables are not set"
 
 func Initialize() error {
-	if len(os.Args) < 7 {
-		println("args:")
-		for _, arg := range os.Args {
-			println(arg)
-		}
-
-		return errors.New("not enough program arguments")
+	environment = os.Getenv("ENVIRONMENT")
+	if environment == "" {
+		return errors.New(missingEnvVarsMessage)
 	}
 
-	dbUrl = os.Args[1]
-	dbPort = os.Args[2]
-	dbName = os.Args[3]
-	dbUsername = os.Args[4]
-	dbPassword = os.Args[5]
-	authSecretKey = os.Args[6]
+	dbUrl = os.Getenv("HOST_NAME")
+	dbPort = os.Getenv("POSTGRES_PRODUCTION_PORT")
+	dbName = os.Getenv("POSTGRES_DB")
+	dbUsername = os.Getenv("POSTGRES_USER")
+	dbPassword = os.Getenv("POSTGRES_PASSWORD")
+
+	if environment == "staging" {
+		dbPort = os.Getenv("POSTGRES_STAGING_PORT")
+	}
+
+	if dbUrl == "" || dbPort == "" || dbName == "" || dbUsername == "" || dbPassword == "" {
+		return errors.New(missingEnvVarsMessage)
+	}
 
 	return nil
 }
@@ -40,8 +44,4 @@ func GetDBSession() (*sql.DB, error) {
 		dbUrl, dbPort, dbUsername, dbPassword, dbName)
 	db, err := sql.Open("postgres", psqlInfo)
 	return db, err
-}
-
-func GetAuthSecretKey() string {
-	return authSecretKey
 }
