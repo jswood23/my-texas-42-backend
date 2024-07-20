@@ -28,6 +28,17 @@ func main() {
 }
 
 func getAppHealth(c *gin.Context) {
+	err := data_access.CheckDBConnection()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"environment": os.Getenv("ENVIRONMENT"),
+			"status":      "unhealthy",
+			"reason":      err.Error(),
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"environment": os.Getenv("ENVIRONMENT"),
 		"status":      "great",
