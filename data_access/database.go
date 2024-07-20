@@ -22,13 +22,14 @@ func Initialize() error {
 		return errors.New(missingEnvVarsMessage)
 	}
 
-	dbUrl = os.Getenv("HOST_NAME")
+	dbUrl = os.Getenv("POSTGRES_PRODUCTION_HOST_NAME")
 	dbPort = os.Getenv("POSTGRES_PRODUCTION_PORT")
 	dbName = os.Getenv("DB_NAME")
 	dbUsername = os.Getenv("POSTGRES_USER")
 	dbPassword = os.Getenv("POSTGRES_PASSWORD")
 
 	if environment == "staging" {
+		dbUrl = os.Getenv("POSTGRES_STAGING_HOST_NAME")
 		dbPort = os.Getenv("POSTGRES_STAGING_PORT")
 	}
 
