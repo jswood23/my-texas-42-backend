@@ -22,7 +22,9 @@ func Initialize() error {
 		return errors.New(missingEnvVarsMessage)
 	}
 
+	// this is the same for both staging and production because we are going to the same port within a different container
 	dbUrl = os.Getenv("POSTGRES_PRODUCTION_HOST_NAME")
+
 	dbPort = os.Getenv("POSTGRES_PRODUCTION_PORT")
 	dbName = os.Getenv("DB_NAME")
 	dbUsername = os.Getenv("POSTGRES_USER")
@@ -30,7 +32,6 @@ func Initialize() error {
 
 	if environment == "staging" {
 		dbUrl = os.Getenv("POSTGRES_STAGING_HOST_NAME")
-		dbPort = os.Getenv("POSTGRES_STAGING_PORT")
 	}
 
 	if dbUrl == "" || dbPort == "" || dbName == "" || dbUsername == "" || dbPassword == "" {
