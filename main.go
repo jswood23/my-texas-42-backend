@@ -4,13 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"my-texas-42-backend/data_access"
+	"my-texas-42-backend/system"
 	"my-texas-42-backend/users"
 	"net/http"
 	"os"
 )
 
 func main() {
-	err := data_access.Initialize()
+	err := system.Initialize()
 	if err != nil {
 		log.Fatal(err)
 	}
