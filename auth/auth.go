@@ -2,7 +2,7 @@ package auth
 
 //func getStore(c *gin.Context) (*pgstore.PGStore, error) {
 //	// Fetch new store
-//	database, err := data_access.GetDBSession()
+//	database, err := services.GetDBSession()
 //	if err != nil {
 //		responseDatabaseError := make(map[string]string)
 //		responseDatabaseError["message"] = "There was a problem connecting to the database."
@@ -12,7 +12,7 @@ package auth
 //		return nil, err
 //	}
 //
-//	store, err := pgstore.NewPGStoreFromPool(database, []byte(data_access.GetAuthSecretKey()))
+//	store, err := pgstore.NewPGStoreFromPool(database, []byte(services.GetAuthSecretKey()))
 //	if err != nil {
 //		responseAuthError := make(map[string]string)
 //		responseAuthError["message"] = "There was a problem authenticating the user."

@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"log"
-	"my-texas-42-backend/data_access"
+	"my-texas-42-backend/services"
 	"my-texas-42-backend/system"
 	"my-texas-42-backend/users"
 	"net/http"
@@ -18,9 +18,9 @@ func main() {
 
 	r := gin.Default()
 
-	//r.GET("/", auth.Authenticate, testRoot)
-	r.POST("/users/new", users.CreateAccount)
 	r.GET("/health", getAppHealth)
+	r.POST("/users/new", users.CreateAccount)
+	r.POST("/users/login", users.Login)
 
 	err = r.Run(":8080")
 	if err != nil {
@@ -29,7 +29,7 @@ func main() {
 }
 
 func getAppHealth(c *gin.Context) {
-	err := data_access.CheckDBConnection()
+	err := services.CheckDBConnection()
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -45,25 +45,3 @@ func getAppHealth(c *gin.Context) {
 		"status":      "great",
 	})
 }
-
-func testRoot(c *gin.Context) {
-	testObj := make(map[string]any)
-	testObj["one"] = 1
-	testObj["two"] = 2
-	testObj["three"] = "four"
-
-	c.JSON(http.StatusOK, testObj)
-}
-
-//func testNewSession(c *gin.Context) {
-//	err := auth.NewSession(c)
-//	if err != nil {
-//		println(err.Error())
-//		return
-//	}
-//
-//	testObj := make(map[string]any)
-//	testObj["message"] = "New session successfully added."
-//
-//	c.JSON(http.StatusOK, testObj)
-//}
