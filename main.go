@@ -19,8 +19,8 @@ func main() {
 	r := gin.Default()
 
 	r.GET("/health", getAppHealth)
-	r.POST("/users/new", users.CreateAccount)
 	r.POST("/users/login", users.Login)
+	r.GET("/users/:username", users.Authenticate, users.GetUserProfile)
 
 	err = r.Run(":8080")
 	if err != nil {
