@@ -11,6 +11,11 @@ type ConfirmSignupAPIModel struct {
 	VerificationCode string `json:"verificationcode"`
 }
 
+type ChangePasswordAPIModel struct {
+	OldPassword string `json:"oldpassword"`
+	NewPassword string `json:"newpassword"`
+}
+
 type LoginAPIModel struct {
 	Username string `json:"username"`
 	Password string `json:"password"`

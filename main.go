@@ -19,9 +19,11 @@ func main() {
 	r := gin.Default()
 
 	r.GET("/health", getAppHealth)
+
 	r.POST("/users", users.Signup)
 	r.PUT("/users/confirm", users.ConfirmSignup)
 	r.POST("/users/login", users.Login)
+	r.PUT("/users/change-password", users.Authenticate, users.ChangePassword)
 	r.GET("/users/:username", users.Authenticate, users.GetUserProfile)
 
 	err = r.Run(":8080")

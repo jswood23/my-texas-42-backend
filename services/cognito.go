@@ -74,6 +74,23 @@ func ConfirmSignUpCognito(username string, confirmationCode string) (*cognitoide
 	return result, nil
 }
 
+func ChangePasswordCognito(accessToken string, oldPassword string, newPassword string) error {
+	provider := getCognitoProvider()
+
+	input := &cognitoidentityprovider.ChangePasswordInput{
+		AccessToken:      aws.String(accessToken),
+		PreviousPassword: aws.String(oldPassword),
+		ProposedPassword: aws.String(newPassword),
+	}
+
+	_, err := provider.ChangePassword(input)
+	if err != nil {
+		return fmt.Errorf("ChangePasswordCognito error: %v", err)
+	}
+
+	return nil
+}
+
 func AuthenticateRequest(accessToken string) (*cognitoidentityprovider.GetUserOutput, error) {
 	provider := getCognitoProvider()
 
