@@ -34,6 +34,46 @@ func LoginCognito(username string, password string) (error, *cognitoidentityprov
 	return nil, output.AuthenticationResult
 }
 
+func SignUpCognito(email string, username string, password string) error {
+	provider := getCognitoProvider()
+
+	input := &cognitoidentityprovider.SignUpInput{
+		ClientId: aws.String(system.GetUserPoolAppKey()),
+		Username: aws.String(username),
+		Password: aws.String(password),
+		UserAttributes: []*cognitoidentityprovider.AttributeType{
+			{
+				Name:  aws.String("email"),
+				Value: aws.String(email),
+			},
+		},
+	}
+
+	_, err := provider.SignUp(input)
+	if err != nil {
+		return fmt.Errorf("SignUpCognito error: %v", err)
+	}
+
+	return nil
+}
+
+func ConfirmSignUpCognito(username string, confirmationCode string) (*cognitoidentityprovider.ConfirmSignUpOutput, error) {
+	provider := getCognitoProvider()
+
+	input := &cognitoidentityprovider.ConfirmSignUpInput{
+		ClientId:         aws.String(system.GetUserPoolAppKey()),
+		Username:         aws.String(username),
+		ConfirmationCode: aws.String(confirmationCode),
+	}
+
+	result, err := provider.ConfirmSignUp(input)
+	if err != nil {
+		return nil, fmt.Errorf("ConfirmSignUpCognito error: %v", err)
+	}
+
+	return result, nil
+}
+
 func AuthenticateRequest(accessToken string) (*cognitoidentityprovider.GetUserOutput, error) {
 	provider := getCognitoProvider()
 

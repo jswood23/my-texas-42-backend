@@ -25,7 +25,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
+	c.JSON(201, gin.H{
 		"message": "Login successful.",
 		"token":   authResult.AccessToken,
 	})
