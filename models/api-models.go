@@ -16,6 +16,10 @@ type ChangePasswordAPIModel struct {
 	NewPassword string `json:"newpassword"`
 }
 
+type ChangeDisplayNameAPIModel struct {
+	NewDisplayName string `json:"displayname"`
+}
+
 type LoginAPIModel struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
