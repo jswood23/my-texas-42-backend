@@ -69,3 +69,18 @@ func Query[T any](query string) ([]T, error) {
 
 	return rows, nil
 }
+
+func Execute(query string) error {
+	db, err := GetDBSession()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	_, err = db.Exec(query)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
