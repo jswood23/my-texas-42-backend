@@ -28,3 +28,7 @@ type LoginAPIModel struct {
 type AddFriendAPIModel struct {
 	ReceiverUsername string `json:"username"`
 }
+
+type RemoveFriendOrRequestAPIModel struct {
+	SenderUsername string `json:"username"`
+}

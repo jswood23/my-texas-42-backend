@@ -29,6 +29,7 @@ func main() {
 	r.GET("/users/:username", users.Authenticate, users.GetUserProfile)
 
 	r.POST("/friends", users.Authenticate, friends.AddFriend)
+	r.DELETE("/friends", users.Authenticate, friends.RemoveFriendOrRequest)
 
 	err = r.Run(":8080")
 	if err != nil {
