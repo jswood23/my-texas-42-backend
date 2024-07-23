@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
 	"my-texas-42-backend/friends"
@@ -9,6 +10,7 @@ import (
 	"my-texas-42-backend/users"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
@@ -18,6 +20,8 @@ func main() {
 	}
 
 	r := gin.Default()
+
+	allowCors(r)
 
 	r.GET("/health", getAppHealth)
 
@@ -36,6 +40,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func allowCors(r *gin.Engine) {
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000", "https://mytexas42.com", "https://www.mytexas42.com"}, // Replace with your allowed origins
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 }
 
 func getAppHealth(c *gin.Context) {
