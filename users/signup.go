@@ -34,7 +34,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	query := sql_scripts.CreateUser(request.Email, request.Username)
+	query := sql_scripts.NewUser(request.Email, request.Username)
 	err = services.Execute(query)
 	if err != nil {
 		c.JSON(500, gin.H{

@@ -28,8 +28,8 @@ func main() {
 	r.PUT("/users/change-display-name", users.Authenticate, users.ChangeDisplayName)
 	r.GET("/users/:username", users.Authenticate, users.GetUserProfile)
 
-	r.POST("/friends", users.Authenticate, friends.AddFriend)
-	r.DELETE("/friends", users.Authenticate, friends.RemoveFriendOrRequest)
+	r.POST("/friends/:username", users.Authenticate, friends.AddFriend)
+	r.DELETE("/friends/:username", users.Authenticate, friends.RemoveFriendOrRequest)
 
 	err = r.Run(":8080")
 	if err != nil {

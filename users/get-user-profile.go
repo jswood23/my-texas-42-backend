@@ -11,7 +11,6 @@ func GetUserProfile(c *gin.Context) {
 	username := c.Param("username")
 
 	query := sql_scripts.GetUserProfileByUsername(username)
-
 	result, err := services.Query[models.UserModel](query)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Error querying database", "reason": err.Error()})

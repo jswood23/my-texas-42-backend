@@ -10,14 +10,7 @@ import (
 )
 
 func AddFriend(c *gin.Context) {
-	request, err := models.DecodeAPIModel[models.AddFriendAPIModel](c.Request.Body)
-	if err != nil {
-		c.JSON(400, gin.H{
-			"message": "Invalid request body.",
-			"reason":  err.Error(),
-		})
-		return
-	}
+	receiverUsername := c.Param("username")
 
 	username, err := util.GetRequestUsername(c)
 	if err != nil {
@@ -26,7 +19,7 @@ func AddFriend(c *gin.Context) {
 	}
 
 	// Check if the friend request already exists
-	query := sql_scripts.CheckForExistingFriendRequest(*username, request.ReceiverUsername)
+	query := sql_scripts.CheckForExistingFriendRequest(*username, receiverUsername)
 	friendRequestRows, err := services.Query[models.FriendRequestModel](query)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -38,18 +31,18 @@ func AddFriend(c *gin.Context) {
 	}
 
 	// Check if the users are already friends
-	query = sql_scripts.CheckForExistingFriend(*username, request.ReceiverUsername)
+	query = sql_scripts.CheckForExistingFriend(*username, receiverUsername)
 	friendRows, err := services.Query[models.FriendModel](query)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 	if len(friendRows) > 0 {
-		c.JSON(400, gin.H{"error": fmt.Sprintf("The user %s is already your friend.", request.ReceiverUsername)})
+		c.JSON(400, gin.H{"error": fmt.Sprintf("The user %s is already your friend.", receiverUsername)})
 		return
 	}
 
-	query = sql_scripts.NewFriendRequest(*username, request.ReceiverUsername)
+	query = sql_scripts.NewFriendRequest(*username, receiverUsername)
 	err = services.Execute(query)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})

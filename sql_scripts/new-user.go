@@ -2,7 +2,7 @@ package sql_scripts
 
 import "fmt"
 
-func CreateUser(email string, username string) string {
+func NewUser(email string, username string) string {
 	return fmt.Sprintf(`
 INSERT INTO public.Users (Email, Username, IsAdmin, DisplayName)
 VALUES ('%s', '%s', FALSE);
