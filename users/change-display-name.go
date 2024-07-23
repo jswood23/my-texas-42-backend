@@ -5,6 +5,7 @@ import (
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/services"
 	"my-texas-42-backend/sql_scripts"
+	"my-texas-42-backend/util"
 )
 
 func ChangeDisplayName(c *gin.Context) {
@@ -14,15 +15,13 @@ func ChangeDisplayName(c *gin.Context) {
 		return
 	}
 
-	username, exists := c.Get("username")
-	if !exists {
-		c.JSON(500, gin.H{"error": "username not found in context"})
+	username, err := util.GetRequestUsername(c)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
-	usernameStr, _ := username.(*string)
-
-	query := sql_scripts.ChangeDisplayName(request.NewDisplayName, *usernameStr)
+	query := sql_scripts.ChangeDisplayName(request.NewDisplayName, *username)
 	err = services.Execute(query)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"my-texas-42-backend/friends"
 	"my-texas-42-backend/services"
 	"my-texas-42-backend/system"
 	"my-texas-42-backend/users"
@@ -26,6 +27,8 @@ func main() {
 	r.PUT("/users/change-password", users.Authenticate, users.ChangePassword)
 	r.PUT("/users/change-display-name", users.Authenticate, users.ChangeDisplayName)
 	r.GET("/users/:username", users.Authenticate, users.GetUserProfile)
+
+	r.POST("/friends", users.Authenticate, friends.AddFriend)
 
 	err = r.Run(":8080")
 	if err != nil {
