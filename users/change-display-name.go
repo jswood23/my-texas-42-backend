@@ -15,13 +15,13 @@ func ChangeDisplayName(c *gin.Context) {
 		return
 	}
 
-	username, err := util.GetRequestUsername(c)
+	user, err := util.GetRequestUser(c)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
-	query := sql_scripts.ChangeDisplayName(request.NewDisplayName, *username)
+	query := sql_scripts.ChangeDisplayName(request.NewDisplayName, user.Username)
 	err = services.Execute(query)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})

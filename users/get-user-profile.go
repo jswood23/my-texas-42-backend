@@ -18,14 +18,14 @@ var userDoesNotExistError = errors.New("user does not exist")
 func GetUserProfile(c *gin.Context) {
 	username := c.Param("username")
 
-	currentUserUsername, err := util.GetRequestUsername(c)
+	currentUser, err := util.GetRequestUser(c)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Error getting username from request", "reason": err.Error()})
 		return
 	}
 
-	if username == *currentUserUsername {
-		userProfile, err := GetCurrentUserProfile(*currentUserUsername)
+	if username == currentUser.Username {
+		userProfile, err := GetCurrentUserProfile(currentUser.Username)
 		if err != nil {
 			c.JSON(500, gin.H{"error": "Error getting user profile", "reason": err.Error()})
 			return
@@ -33,10 +33,6 @@ func GetUserProfile(c *gin.Context) {
 		c.JSON(200, userProfile)
 		return
 	} else {
-		query := sql_scripts.GetUserProfileByUsername(*currentUserUsername)
-		currentUserResult, err := services.Query[models.UserModel](query)
-		currentUser := currentUserResult[0]
-
 		otherUserProfile, err := GetOtherUserProfile(username, currentUser.UserID, currentUser.Username)
 		if err != nil {
 			if errors.Is(err, userDoesNotExistError) {

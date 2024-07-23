@@ -11,14 +11,14 @@ import (
 func RemoveFriendOrRequest(c *gin.Context) {
 	otherUserUsername := c.Param("username")
 
-	username, err := util.GetRequestUsername(c)
+	currentUser, err := util.GetRequestUser(c)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Check if the friend request exists
-	query := sql_scripts.CheckForExistingFriendRequest(otherUserUsername, *username)
+	query := sql_scripts.CheckForExistingFriendRequest(otherUserUsername, currentUser.Username)
 	friendRequestRows, err := services.Query[models.FriendRequestModel](query)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -26,7 +26,7 @@ func RemoveFriendOrRequest(c *gin.Context) {
 	}
 
 	if len(friendRequestRows) > 0 {
-		query = sql_scripts.RemoveFriendRequest(otherUserUsername, *username)
+		query = sql_scripts.RemoveFriendRequest(otherUserUsername, currentUser.Username)
 		err = services.Execute(query)
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
@@ -36,7 +36,7 @@ func RemoveFriendOrRequest(c *gin.Context) {
 	}
 
 	// Check if the users are already friends
-	query = sql_scripts.CheckForExistingFriend(otherUserUsername, *username)
+	query = sql_scripts.CheckForExistingFriend(otherUserUsername, currentUser.Username)
 	friendRows, err := services.Query[models.FriendModel](query)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -44,7 +44,7 @@ func RemoveFriendOrRequest(c *gin.Context) {
 	}
 
 	if len(friendRows) > 0 {
-		query = sql_scripts.RemoveFriend(otherUserUsername, *username)
+		query = sql_scripts.RemoveFriend(otherUserUsername, currentUser.Username)
 		err = services.Execute(query)
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})

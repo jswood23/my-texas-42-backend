@@ -3,15 +3,21 @@ package util
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"my-texas-42-backend/models"
 )
 
-func GetRequestUsername(c *gin.Context) (*string, error) {
-	username, exists := c.Get("username")
+var userNotFoundError = errors.New("user not found in context")
+
+func GetRequestUser(c *gin.Context) (*models.UserModel, error) {
+	user, exists := c.Get("user")
 	if !exists {
-		return nil, errors.New("username not found in context")
+		return nil, userNotFoundError
 	}
 
-	usernameStr, _ := username.(*string)
+	userModel, ok := user.(models.UserModel)
+	if !ok {
+		return nil, userNotFoundError
+	}
 
-	return usernameStr, nil
+	return &userModel, nil
 }

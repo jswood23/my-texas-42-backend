@@ -2,7 +2,9 @@ package users
 
 import (
 	"github.com/gin-gonic/gin"
+	"my-texas-42-backend/models"
 	"my-texas-42-backend/services"
+	"my-texas-42-backend/sql_scripts"
 )
 
 func Authenticate(c *gin.Context) {
@@ -17,9 +19,14 @@ func Authenticate(c *gin.Context) {
 		return
 	}
 
-	// TODO: get user profile by username and save to the request
+	query := sql_scripts.GetUserProfileByUsername(*authResult.Username)
+	result, err := services.Query[models.UserModel](query)
+	if err != nil || len(result) == 0 {
+		c.JSON(500, gin.H{"error": "User data was not found."})
+		return
+	}
 
-	c.Set("username", authResult.Username)
+	c.Set("user", result[0])
+
 	c.Set("emailVerified", authResult.UserAttributes[1])
-	c.Set("email", authResult.UserAttributes[2])
 }
