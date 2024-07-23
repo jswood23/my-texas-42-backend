@@ -17,6 +17,8 @@ func Authenticate(c *gin.Context) {
 		return
 	}
 
+	// TODO: get user profile by username and save to the request
+
 	c.Set("username", authResult.Username)
 	c.Set("emailVerified", authResult.UserAttributes[1])
 	c.Set("email", authResult.UserAttributes[2])
