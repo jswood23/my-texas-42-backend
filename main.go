@@ -28,6 +28,7 @@ func main() {
 	r.POST("/users", users.Signup)
 	r.PUT("/users/confirm", users.ConfirmSignup)
 	r.POST("/users/login", users.Login)
+	r.GET("/users/current", users.Authenticate, users.GetCurrentUser)
 	r.PUT("/users/change-password", users.Authenticate, users.ChangePassword)
 	r.PUT("/users/change-display-name", users.Authenticate, users.ChangeDisplayName)
 	r.GET("/users/:username", users.Authenticate, users.GetUserProfile)

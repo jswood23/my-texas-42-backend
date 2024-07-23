@@ -27,6 +27,7 @@ func Authenticate(c *gin.Context) {
 	}
 
 	c.Set("user", result[0])
-
+	c.Set("sub", authResult.UserAttributes[0])
 	c.Set("emailVerified", authResult.UserAttributes[1])
+	c.Set("email", authResult.UserAttributes[2])
 }

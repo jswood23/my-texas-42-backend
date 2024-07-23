@@ -1,5 +1,18 @@
 package models
 
+type AuthenticatedUserAttributes struct {
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"emailverified"`
+	Sub           string `json:"sub"`
+}
+
+type CurrentUserAPIModel struct {
+	Exists      bool                        `json:"exists"`
+	Attributes  AuthenticatedUserAttributes `json:"attributes"`
+	Username    string                      `json:"username"`
+	DisplayName string                      `json:"displayname"`
+}
+
 type SignupAPIModel struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
