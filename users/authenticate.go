@@ -8,26 +8,38 @@ import (
 )
 
 func Authenticate(c *gin.Context) {
+	authenticateWithCognito(c, true)
+}
+
+func authenticateWithCognito(c *gin.Context, abortIfNotAuthenticated bool) bool {
 	authToken := c.GetHeader("Authorization")
 	if authToken == "" {
-		c.AbortWithStatus(401)
-		return
+		if abortIfNotAuthenticated {
+			c.AbortWithStatus(401)
+		}
+		return false
 	}
 	authResult, err := services.AuthenticateRequest(authToken)
 	if err != nil {
-		c.AbortWithStatus(401)
-		return
+		if !abortIfNotAuthenticated {
+			c.AbortWithStatus(401)
+		}
+		return false
 	}
 
 	query := sql_scripts.GetUserProfileByUsername(*authResult.Username)
 	result, err := services.Query[models.UserModel](query)
 	if err != nil || len(result) == 0 {
-		c.JSON(500, gin.H{"error": "User data was not found."})
-		return
+		if abortIfNotAuthenticated {
+			c.JSON(500, gin.H{"error": "User data was not found."})
+		}
+		return false
 	}
 
 	c.Set("user", result[0])
 	c.Set("sub", authResult.UserAttributes[0])
 	c.Set("emailVerified", authResult.UserAttributes[1])
 	c.Set("email", authResult.UserAttributes[2])
+
+	return true
 }

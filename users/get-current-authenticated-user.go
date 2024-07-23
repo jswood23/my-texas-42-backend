@@ -8,6 +8,24 @@ import (
 )
 
 func GetCurrentUser(c *gin.Context) {
+	isAuthenticated := authenticateWithCognito(c, false)
+
+	if !isAuthenticated {
+		response := models.CurrentUserAPIModel{
+			Exists: false,
+			Attributes: models.AuthenticatedUserAttributes{
+				Email:         "",
+				EmailVerified: false,
+				Sub:           "",
+			},
+			Username:    "",
+			DisplayName: "",
+		}
+
+		c.JSON(200, response)
+		return
+	}
+
 	user, err := util.GetRequestUser(c)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
