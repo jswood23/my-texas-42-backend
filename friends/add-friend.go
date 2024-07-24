@@ -18,8 +18,22 @@ func AddFriend(c *gin.Context) {
 		return
 	}
 
+	// Check if the users are the same
+	if receiverUsername == user.Username {
+		c.JSON(400, gin.H{"error": "You cannot be friends with yourself."})
+		return
+	}
+
+	// Check if the user exists
+	query := sql_scripts.GetUserProfileByUsername(receiverUsername)
+	userRows, err := services.Query[models.UserModel](query)
+	if err != nil || len(userRows) == 0 {
+		c.JSON(404, gin.H{"error": "User not found."})
+		return
+	}
+
 	// Check if the friend request already exists
-	query := sql_scripts.CheckForExistingFriendRequest(user.Username, receiverUsername)
+	query = sql_scripts.CheckForExistingFriendRequest(user.Username, receiverUsername)
 	friendRequestRows, err := services.Query[models.FriendRequestModel](query)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -49,5 +63,5 @@ func AddFriend(c *gin.Context) {
 		return
 	}
 
-	c.AbortWithStatus(200)
+	c.JSON(200, gin.H{"message": "Friend request sent."})
 }

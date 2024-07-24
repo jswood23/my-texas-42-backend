@@ -17,8 +17,22 @@ func RemoveFriendOrRequest(c *gin.Context) {
 		return
 	}
 
+	// Check if the users are the same
+	if otherUserUsername == currentUser.Username {
+		c.JSON(400, gin.H{"error": "You cannot be friends with yourself."})
+		return
+	}
+
+	// Check if the user exists
+	query := sql_scripts.GetUserProfileByUsername(otherUserUsername)
+	userRows, err := services.Query[models.UserModel](query)
+	if err != nil || len(userRows) == 0 {
+		c.JSON(404, gin.H{"error": "User not found."})
+		return
+	}
+
 	// Check if the friend request exists
-	query := sql_scripts.CheckForExistingFriendRequest(otherUserUsername, currentUser.Username)
+	query = sql_scripts.CheckForExistingFriendRequest(otherUserUsername, currentUser.Username)
 	friendRequestRows, err := services.Query[models.FriendRequestModel](query)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -32,6 +46,7 @@ func RemoveFriendOrRequest(c *gin.Context) {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
 		}
+		c.JSON(200, gin.H{"message": "Friend request removed."})
 		return
 	}
 
@@ -50,6 +65,7 @@ func RemoveFriendOrRequest(c *gin.Context) {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
 		}
+		c.JSON(200, gin.H{"message": "Friend removed."})
 		return
 	}
 

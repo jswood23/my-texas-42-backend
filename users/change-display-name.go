@@ -28,5 +28,5 @@ func ChangeDisplayName(c *gin.Context) {
 		return
 	}
 
-	c.AbortWithStatus(200)
+	c.JSON(200, gin.H{"message": "Display name changed."})
 }

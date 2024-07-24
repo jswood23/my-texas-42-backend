@@ -15,6 +15,6 @@ WITH UserIDs AS (
 )
 DELETE FROM public.Friends
 WHERE User1ID = ( SELECT UserID FROM UserIDs WHERE x = 1 ) AND User2ID = ( SELECT UserID FROM UserIDs WHERE x = 2 )
-OR User2ID = ( SELECT UserID FROM UserIDs WHERE x = 2 ) AND User1ID = ( SELECT UserID FROM UserIDs WHERE x = 1 );
+OR User1ID = ( SELECT UserID FROM UserIDs WHERE x = 2 ) AND User2ID = ( SELECT UserID FROM UserIDs WHERE x = 1 );
 `, sanitizedSenderUsername, sanitizedReceiverUsername)
 }

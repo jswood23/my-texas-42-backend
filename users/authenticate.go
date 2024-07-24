@@ -15,14 +15,14 @@ func authenticateWithCognito(c *gin.Context, abortIfNotAuthenticated bool) bool 
 	authToken := c.GetHeader("Authorization")
 	if authToken == "" {
 		if abortIfNotAuthenticated {
-			c.AbortWithStatus(401)
+			c.JSON(401, gin.H{"error": "No authorization token provided."})
 		}
 		return false
 	}
 	authResult, err := services.AuthenticateRequest(authToken)
 	if err != nil {
 		if !abortIfNotAuthenticated {
-			c.AbortWithStatus(401)
+			c.JSON(401, gin.H{"error": "Invalid authorization token."})
 		}
 		return false
 	}

@@ -13,7 +13,7 @@ func CheckAdminUser(c *gin.Context) {
 	}
 
 	if !user.IsAdmin {
-		c.AbortWithStatus(401)
+		c.JSON(401, gin.H{"error": "You need admin permissions to view this resource."})
 		return
 	}
 }

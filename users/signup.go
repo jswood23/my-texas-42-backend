@@ -43,7 +43,9 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	c.AbortWithStatus(201)
+	c.JSON(201, gin.H{
+		"message": "User created.",
+	})
 }
 
 func ConfirmSignup(c *gin.Context) {
@@ -64,5 +66,7 @@ func ConfirmSignup(c *gin.Context) {
 		return
 	}
 
-	c.AbortWithStatus(200)
+	c.JSON(200, gin.H{
+		"message": "User confirmed.",
+	})
 }
