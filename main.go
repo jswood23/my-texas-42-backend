@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
+	"my-texas-42-backend/auth"
 	"my-texas-42-backend/friends"
 	"my-texas-42-backend/services"
 	"my-texas-42-backend/system"
@@ -29,13 +30,13 @@ func main() {
 	r.PUT("/users/confirm", users.ConfirmSignup)
 	r.POST("/users/login", users.Login)
 	r.GET("/users/current", users.GetCurrentUser)
-	r.PUT("/users/change-password", users.Authenticate, users.ChangePassword)
-	r.PUT("/users/change-display-name", users.Authenticate, users.ChangeDisplayName)
-	r.GET("/users/:username", users.Authenticate, users.GetUserProfile)
+	r.PUT("/users/change-password", auth.Authenticate, users.ChangePassword)
+	r.PUT("/users/change-display-name", auth.Authenticate, users.ChangeDisplayName)
+	r.GET("/users/:username", auth.Authenticate, users.GetUserProfile)
 
-	r.POST("/friends/:username", users.Authenticate, friends.AddFriend)
-	r.POST("/friends/:username/accept", users.Authenticate, friends.AcceptFriendRequest)
-	r.DELETE("/friends/:username", users.Authenticate, friends.RemoveFriendOrRequest)
+	r.POST("/friends/:username", auth.Authenticate, friends.AddFriend)
+	r.POST("/friends/:username/accept", auth.Authenticate, friends.AcceptFriendRequest)
+	r.DELETE("/friends/:username", auth.Authenticate, friends.RemoveFriendOrRequest)
 
 	err = r.Run(":8080")
 	if err != nil {
