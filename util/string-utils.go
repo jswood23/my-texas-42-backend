@@ -32,3 +32,10 @@ func containsSpecialCharacters(input string) bool {
 	containsSpecialCharacters := re.MatchString(input)
 	return containsSpecialCharacters
 }
+
+func IsEmailValid(email string) bool {
+	pattern := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	re := regexp.MustCompile(pattern)
+	isEmailValid := re.MatchString(email)
+	return isEmailValid
+}

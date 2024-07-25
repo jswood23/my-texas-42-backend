@@ -10,7 +10,7 @@ import (
 
 var cognitoSession *session.Session
 
-func LoginCognito(username string, password string) (error, *cognitoidentityprovider.AuthenticationResultType) {
+func LoginCognito(username string, password string) (*cognitoidentityprovider.AuthenticationResultType, error) {
 	provider := getCognitoProvider()
 
 	input := &cognitoidentityprovider.InitiateAuthInput{
@@ -24,14 +24,14 @@ func LoginCognito(username string, password string) (error, *cognitoidentityprov
 
 	output, err := provider.InitiateAuth(input)
 	if err != nil {
-		return fmt.Errorf("LoginCognito error: %v", err), nil
+		return nil, fmt.Errorf("LoginCognito error: %v", err)
 	}
 
 	if output.AuthenticationResult == nil {
-		return fmt.Errorf("user not found"), nil
+		return nil, fmt.Errorf("user not found")
 	}
 
-	return nil, output.AuthenticationResult
+	return output.AuthenticationResult, nil
 }
 
 func SignUpCognito(email string, username string, password string) error {
