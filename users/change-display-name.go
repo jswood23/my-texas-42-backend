@@ -15,6 +15,11 @@ func ChangeDisplayName(c *gin.Context) {
 		return
 	}
 
+	if !util.IsUsernameValid(request.NewDisplayName) {
+		c.JSON(400, gin.H{"error": "Invalid display name."})
+		return
+	}
+
 	user, err := util.GetRequestUser(c)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})

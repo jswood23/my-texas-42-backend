@@ -5,6 +5,7 @@ import (
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/services"
 	"my-texas-42-backend/sql_scripts"
+	"my-texas-42-backend/util"
 )
 
 func Signup(c *gin.Context) {
@@ -13,6 +14,13 @@ func Signup(c *gin.Context) {
 		c.JSON(400, gin.H{
 			"message": "Invalid request body.",
 			"reason":  err.Error(),
+		})
+		return
+	}
+
+	if !util.IsUsernameValid(request.Username) {
+		c.JSON(400, gin.H{
+			"message": "Invalid username.",
 		})
 		return
 	}
