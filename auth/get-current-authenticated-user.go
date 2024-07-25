@@ -1,15 +1,14 @@
-package users
+package auth
 
 import (
 	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 	"github.com/gin-gonic/gin"
-	"my-texas-42-backend/auth"
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/util"
 )
 
 func GetCurrentUser(c *gin.Context) {
-	isAuthenticated := auth.authenticateWithCognito(c, false)
+	isAuthenticated := authenticateWithCognito(c, false)
 
 	if !isAuthenticated {
 		response := models.CurrentUserAPIModel{
