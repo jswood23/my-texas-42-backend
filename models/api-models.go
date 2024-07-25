@@ -59,7 +59,7 @@ type UserStatsAPIModel struct {
 }
 
 type UserProfileAPIModel struct {
-	UserID           int               `json:"id"`
+	UserID           UserID            `json:"id"`
 	Username         string            `json:"username"`
 	Email            string            `json:"email"`
 	DisplayName      string            `json:"displayname"`
@@ -69,7 +69,7 @@ type UserProfileAPIModel struct {
 }
 
 type OtherUserProfileAPIModel struct {
-	UserID        int               `json:"id"`
+	UserID        UserID            `json:"id"`
 	Username      string            `json:"username"`
 	DisplayName   string            `json:"displayname"`
 	IsFriends     bool              `json:"isfriends"`

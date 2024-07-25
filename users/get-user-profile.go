@@ -105,7 +105,7 @@ func GetCurrentUserProfile(username string) (*models.UserProfileAPIModel, error)
 	}, nil
 }
 
-func GetOtherUserProfile(username string, currentUserID int, currentUserName string) (*models.OtherUserProfileAPIModel, error) {
+func GetOtherUserProfile(username string, currentUserID models.UserID, currentUserName string) (*models.OtherUserProfileAPIModel, error) {
 	query := sql_scripts.GetUserProfileByUsername(username)
 	userResult, err := services.Query[models.UserModel](query)
 	if err != nil {

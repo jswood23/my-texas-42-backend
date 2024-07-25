@@ -1,8 +1,11 @@
 package sql_scripts
 
-import "fmt"
+import (
+	"fmt"
+	"my-texas-42-backend/models"
+)
 
-func GetUser(userid int) string {
+func GetUser(userid models.UserID) string {
 	return fmt.Sprintf(`
 SELECT * FROM public.Users
 WHERE UserID = %d;
