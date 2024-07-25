@@ -4,9 +4,11 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
+	"my-texas-42-backend/admin"
 	"my-texas-42-backend/auth"
 	"my-texas-42-backend/friends"
 	"my-texas-42-backend/services"
+	"my-texas-42-backend/sockets"
 	"my-texas-42-backend/system"
 	"my-texas-42-backend/users"
 	"net/http"
@@ -26,6 +28,8 @@ func main() {
 
 	r.GET("/health", getAppHealth)
 
+	r.GET("/app", auth.Authenticate, auth.CheckAdminUser, admin.GetAppStats)
+
 	r.POST("/users", users.Signup)
 	r.PUT("/users/confirm", users.ConfirmSignup)
 	r.POST("/users/login", users.Login)
@@ -37,6 +41,8 @@ func main() {
 	r.POST("/friends/:username", auth.Authenticate, friends.AddFriend)
 	r.POST("/friends/:username/accept", auth.Authenticate, friends.AcceptFriendRequest)
 	r.DELETE("/friends/:username", auth.Authenticate, friends.RemoveFriendOrRequest)
+
+	r.GET("/ws", auth.Authenticate, sockets.Connect)
 
 	err = r.Run(":8080")
 	if err != nil {

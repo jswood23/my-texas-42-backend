@@ -1,5 +1,7 @@
 package models
 
+import "github.com/gorilla/websocket"
+
 type UserID int
 
 type UserModel struct {
@@ -42,4 +44,43 @@ type FriendModel struct {
 	FriendsID int    `db:"friendsid"`
 	User1ID   UserID `db:"user1id"`
 	User2ID   UserID `db:"user2id"`
+}
+
+type ConnectionMap map[UserID]*websocket.Conn
+
+type RoundRules struct {
+	Bid         int    `json:"bid"`
+	BiddingTeam int    `json:"biddingTeam"`
+	Trump       string `json:"trump"`
+	Variant     string `json:"variant"`
+}
+
+type GameState struct {
+	MatchName              string      `json:"match_name"`
+	MatchInviteCode        string      `json:"match_invite_code"`
+	Rules                  []string    `json:"rules"`
+	Team1                  []string    `json:"team_1"`
+	Team2                  []string    `json:"team_2"`
+	CurrentRound           int         `json:"current_round"`
+	CurrentStartingBidder  int         `json:"current_starting_bidder"`
+	CurrentStartingPlayer  int         `json:"current_starting_player"`
+	CurrentIsBidding       bool        `json:"current_is_bidding"`
+	CurrentPlayerTurn      int         `json:"current_player_turn"`
+	CurrentRoundRules      interface{} `json:"current_round_rules"`
+	CurrentTeam1RoundScore int         `json:"current_team_1_round_score"`
+	CurrentTeam2RoundScore int         `json:"current_team_2_round_score"`
+	CurrentTeam1TotalScore int         `json:"current_team_1_total_score"`
+	CurrentTeam2TotalScore int         `json:"current_team_2_total_score"`
+	CurrentRoundHistory    []string    `json:"current_round_history"`
+	TotalRoundHistory      []string    `json:"total_round_history"`
+}
+
+type PlayerGameState struct {
+	GameState
+	PlayerDominoes []string `json:"player_dominoes"`
+}
+
+type GlobalGameState struct {
+	GameState
+	AllPlayerDominoes []string `json:"all_player_dominoes"`
 }

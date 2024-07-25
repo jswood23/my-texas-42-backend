@@ -76,3 +76,10 @@ type OtherUserProfileAPIModel struct {
 	IsRequestSent bool              `json:"isrequestsent"`
 	Stats         UserStatsAPIModel `json:"stats"`
 }
+
+type WebsocketMessageAPIModel struct {
+	MessageType string          `json:"messagetype"`
+	Message     string          `json:"message"`
+	Username    string          `json:"username"`
+	GameData    PlayerGameState `json:"gamedata"`
+}
