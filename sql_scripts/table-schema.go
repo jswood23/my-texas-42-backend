@@ -9,7 +9,8 @@ create table if not exists public.Users
             primary key,
     Username       varchar(26) not null,
     Email          varchar(31) not null,
-    IsAdmin        boolean
+    IsAdmin        boolean,
+    displayname varchar(26)
 );
 
 create table if not exists public.Friends
@@ -59,7 +60,10 @@ create table if not exists public.UserStats
     TimesCallingSplash   integer default 0 not null,
     TimesCallingPlunge   integer default 0 not null,
     TimesCallingSevens   integer default 0 not null,
-    TimesCallingDelve    integer default 0 not null
+    TimesCallingDelve    integer default 0 not null,
+    userid               integer           not null
+        constraint userstats_users_userid_fk
+            references public.users
 );
 
 create table if not exists public.MatchArchive
