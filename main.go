@@ -53,7 +53,7 @@ func main() {
 func allowCors(r *gin.Engine) {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000", "https://mytexas42.com", "https://www.mytexas42.com", "https://staging-app.mytexas42.com", "https://www.staging-app.mytexas42.com"}, // Replace with your allowed origins
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
