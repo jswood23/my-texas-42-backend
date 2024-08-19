@@ -46,6 +46,7 @@ func initializeDB() error {
 
 	if environment == "staging" {
 		dbUrl = os.Getenv("POSTGRES_STAGING_HOST_NAME")
+		dbPort = os.Getenv("POSTGRES_STAGING_PORT")
 	}
 
 	if dbUrl == "" || dbPort == "" || dbName == "" || dbUsername == "" || dbPassword == "" {

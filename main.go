@@ -22,9 +22,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	r := gin.Default()
-
-	allowCors(r)
+	r := getRouter()
 
 	r.GET("/health", getAppHealth)
 
@@ -50,26 +48,32 @@ func main() {
 	}
 }
 
-func allowCors(r *gin.Engine) {
-	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{
+func getRouter() *gin.Engine {
+	r := gin.Default()
+
+	origins := []string{
+		"https://mytexas42.com",
+		"https://www.mytexas42.com",
+	}
+
+	if system.GetEnv() == "staging" {
+		origins = []string{
 			"http://localhost:3000",
-			"https://localhost:3000",
-			"http://mytexas42.com",
-			"https://mytexas42.com",
-			"http://www.mytexas42.com",
-			"https://www.mytexas42.com",
-			"http://staging-app.mytexas42.com",
 			"https://staging-app.mytexas42.com",
-			"http://www.staging-app.mytexas42.com",
 			"https://www.staging-app.mytexas42.com",
-		},
+		}
+	}
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     origins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
+		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+
+	return r
 }
 
 func getAppHealth(c *gin.Context) {
