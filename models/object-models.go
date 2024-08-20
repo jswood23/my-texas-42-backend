@@ -4,6 +4,8 @@ import "github.com/gorilla/websocket"
 
 type UserID int
 
+type LogLevel int
+
 type UserModel struct {
 	UserID      UserID `db:"userid"`
 	Username    string `db:"username"`

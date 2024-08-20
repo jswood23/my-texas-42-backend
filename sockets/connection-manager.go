@@ -3,7 +3,9 @@ package sockets
 import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
+	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
+	"my-texas-42-backend/util"
 	"sync"
 )
 
@@ -32,13 +34,18 @@ func (cm *ConnectionManager) RemoveConnection(userID models.UserID) {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
 	if conn, ok := cm.connections[userID]; ok {
-		conn.Close()
+		err := conn.Close()
+
+		if err != nil {
+			logger.Error("Failed to close ws connection: " + err.Error())
+		}
+
 		delete(cm.connections, userID)
 	}
 }
 
 // SendMessage sends a message to a specific user by user ID.
-func (cm *ConnectionManager) SendMessage(userID models.UserID, message models.WebsocketMessageAPIModel) error {
+func (cm *ConnectionManager) SendMessage(userID models.UserID, message models.WSOutgoingMessageAPIModel) error {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
 	if conn, ok := cm.connections[userID]; ok {
@@ -49,12 +56,16 @@ func (cm *ConnectionManager) SendMessage(userID models.UserID, message models.We
 }
 
 // BroadcastMessage sends a message to all connected users.
-func (cm *ConnectionManager) BroadcastMessage(message models.WebsocketMessageAPIModel) {
+func (cm *ConnectionManager) BroadcastMessage(message models.WSOutgoingMessageAPIModel) {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
 	for _, conn := range cm.connections {
 		messageByte, _ := json.Marshal(message)
-		conn.WriteMessage(websocket.TextMessage, messageByte)
+		err := conn.WriteMessage(websocket.TextMessage, messageByte)
+
+		if err != nil {
+			logger.Error("Failed to broadcast ws message: " + err.Error())
+		}
 	}
 }
 

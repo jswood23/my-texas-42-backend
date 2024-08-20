@@ -3,10 +3,10 @@ package main
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"log"
 	"my-texas-42-backend/admin"
 	"my-texas-42-backend/auth"
 	"my-texas-42-backend/friends"
+	"my-texas-42-backend/logger"
 	"my-texas-42-backend/services"
 	"my-texas-42-backend/sockets"
 	"my-texas-42-backend/system"
@@ -19,8 +19,11 @@ import (
 func main() {
 	err := system.Initialize()
 	if err != nil {
-		log.Fatal(err)
+		logger.Critical("Failed to start server: " + err.Error())
+		return
 	}
+	logger.Info("Starting server")
+	defer logger.Info("Stopping server") // this doesn't work right now
 
 	r := getRouter()
 
@@ -44,7 +47,8 @@ func main() {
 
 	err = r.Run(":8080")
 	if err != nil {
-		log.Fatal(err)
+		logger.Critical("Failed to start server: " + err.Error())
+		return
 	}
 }
 
