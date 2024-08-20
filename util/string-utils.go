@@ -1,6 +1,7 @@
 package util
 
 import (
+	"my-texas-42-backend/models"
 	"regexp"
 	"strings"
 )
@@ -38,4 +39,8 @@ func IsEmailValid(email string) bool {
 	re := regexp.MustCompile(pattern)
 	isEmailValid := re.MatchString(email)
 	return isEmailValid
+}
+
+func IsDominoNameValid(d models.DominoName) bool {
+	return regexp.MustCompile(`^[0-6]-[0-6]$`).MatchString(string(d))
 }

@@ -55,12 +55,17 @@ type RoundRules struct {
 	Variant     string `json:"variant"`
 }
 
+type InviteCode string
+
+type DominoName string
+
 type GameState struct {
 	MatchName              string      `json:"match_name"`
-	MatchInviteCode        string      `json:"match_invite_code"`
+	MatchInviteCode        InviteCode  `json:"match_invite_code"`
 	Rules                  []string    `json:"rules"`
-	Team1                  []string    `json:"team_1"`
-	Team2                  []string    `json:"team_2"`
+	Team1UserNames         []string    `json:"team_1"`
+	Team2UserNames         []string    `json:"team_2"`
+	IsConnected            []bool      `json:"is_connected"`
 	CurrentRound           int         `json:"current_round"`
 	CurrentStartingBidder  int         `json:"current_starting_bidder"`
 	CurrentStartingPlayer  int         `json:"current_starting_player"`
@@ -77,10 +82,14 @@ type GameState struct {
 
 type PlayerGameState struct {
 	GameState
-	PlayerDominoes []string `json:"player_dominoes"`
+	PlayerDominoes []DominoName `json:"player_dominoes"`
 }
 
 type GlobalGameState struct {
 	GameState
-	AllPlayerDominoes []string `json:"all_player_dominoes"`
+	AllPlayerDominoes []DominoName
+	Team1PlayerIDs    []UserID
+	Team2PlayerIDs    []UserID
 }
+
+type GameMap map[InviteCode]*GlobalGameState
