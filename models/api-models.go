@@ -77,9 +77,18 @@ type OtherUserProfileAPIModel struct {
 	Stats         UserStatsAPIModel `json:"stats"`
 }
 
-type WebsocketMessageAPIModel struct {
+type WSOutgoingMessageAPIModel struct {
 	MessageType string          `json:"messagetype"`
 	Message     string          `json:"message"`
 	Username    string          `json:"username"`
 	GameData    PlayerGameState `json:"gamedata"`
+}
+
+type WSIncomingMessageAPIModel struct {
+	Action string                 `json:"action"`
+	Data   map[string]interface{} `json:"data"`
+}
+
+type WSSendChatMessageAPIModel struct {
+	Message string `json:"message"`
 }
