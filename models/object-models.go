@@ -61,25 +61,28 @@ type InviteCode string
 
 type DominoName string
 
+type PrivacyLevel string
+
 type GameState struct {
-	MatchName              string      `json:"match_name"`
-	MatchInviteCode        InviteCode  `json:"match_invite_code"`
-	Rules                  []string    `json:"rules"`
-	Team1UserNames         []string    `json:"team_1"`
-	Team2UserNames         []string    `json:"team_2"`
-	IsConnected            []bool      `json:"is_connected"`
-	CurrentRound           int         `json:"current_round"`
-	CurrentStartingBidder  int         `json:"current_starting_bidder"`
-	CurrentStartingPlayer  int         `json:"current_starting_player"`
-	CurrentIsBidding       bool        `json:"current_is_bidding"`
-	CurrentPlayerTurn      int         `json:"current_player_turn"`
-	CurrentRoundRules      interface{} `json:"current_round_rules"`
-	CurrentTeam1RoundScore int         `json:"current_team_1_round_score"`
-	CurrentTeam2RoundScore int         `json:"current_team_2_round_score"`
-	CurrentTeam1TotalScore int         `json:"current_team_1_total_score"`
-	CurrentTeam2TotalScore int         `json:"current_team_2_total_score"`
-	CurrentRoundHistory    []string    `json:"current_round_history"`
-	TotalRoundHistory      []string    `json:"total_round_history"`
+	MatchName              string       `json:"match_name"`
+	MatchInviteCode        InviteCode   `json:"match_invite_code"`
+	MatchPrivacy           PrivacyLevel `json:"match_privacy"`
+	Rules                  []string     `json:"rules"`
+	Team1UserNames         []string     `json:"team_1"`
+	Team2UserNames         []string     `json:"team_2"`
+	IsConnected            []bool       `json:"is_connected"`
+	CurrentRound           int          `json:"current_round"`
+	CurrentStartingBidder  int          `json:"current_starting_bidder"`
+	CurrentStartingPlayer  int          `json:"current_starting_player"`
+	CurrentIsBidding       bool         `json:"current_is_bidding"`
+	CurrentPlayerTurn      int          `json:"current_player_turn"`
+	CurrentRoundRules      interface{}  `json:"current_round_rules"`
+	CurrentTeam1RoundScore int          `json:"current_team_1_round_score"`
+	CurrentTeam2RoundScore int          `json:"current_team_2_round_score"`
+	CurrentTeam1TotalScore int          `json:"current_team_1_total_score"`
+	CurrentTeam2TotalScore int          `json:"current_team_2_total_score"`
+	CurrentRoundHistory    []string     `json:"current_round_history"`
+	TotalRoundHistory      []string     `json:"total_round_history"`
 }
 
 type PlayerGameState struct {
