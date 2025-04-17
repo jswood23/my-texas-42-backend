@@ -4,6 +4,8 @@ import "github.com/gorilla/websocket"
 
 type UserID int
 
+type LogLevel int
+
 type UserModel struct {
 	UserID      UserID `db:"userid"`
 	Username    string `db:"username"`
@@ -55,32 +57,52 @@ type RoundRules struct {
 	Variant     string `json:"variant"`
 }
 
+type InviteCode string
+
+type DominoName string
+
+type PrivacyLevel string
+
+const (
+	PrivacyPublic  PrivacyLevel = "public"
+	PrivacyPrivate PrivacyLevel = "private"
+	PrivacyFriends PrivacyLevel = "friends"
+)
+
 type GameState struct {
-	MatchName              string      `json:"match_name"`
-	MatchInviteCode        string      `json:"match_invite_code"`
-	Rules                  []string    `json:"rules"`
-	Team1                  []string    `json:"team_1"`
-	Team2                  []string    `json:"team_2"`
-	CurrentRound           int         `json:"current_round"`
-	CurrentStartingBidder  int         `json:"current_starting_bidder"`
-	CurrentStartingPlayer  int         `json:"current_starting_player"`
-	CurrentIsBidding       bool        `json:"current_is_bidding"`
-	CurrentPlayerTurn      int         `json:"current_player_turn"`
-	CurrentRoundRules      interface{} `json:"current_round_rules"`
-	CurrentTeam1RoundScore int         `json:"current_team_1_round_score"`
-	CurrentTeam2RoundScore int         `json:"current_team_2_round_score"`
-	CurrentTeam1TotalScore int         `json:"current_team_1_total_score"`
-	CurrentTeam2TotalScore int         `json:"current_team_2_total_score"`
-	CurrentRoundHistory    []string    `json:"current_round_history"`
-	TotalRoundHistory      []string    `json:"total_round_history"`
+	MatchName              string       `json:"match_name"`
+	MatchInviteCode        InviteCode   `json:"match_invite_code"`
+	MatchPrivacy           PrivacyLevel `json:"match_privacy"`
+	Rules                  []string     `json:"rules"`
+	OwnerUsername          string       `json:"owner_username"`
+	Team1UserNames         []string     `json:"team_1"`
+	Team2UserNames         []string     `json:"team_2"`
+	IsConnected            []bool       `json:"is_connected"`
+	CurrentRound           int          `json:"current_round"`
+	CurrentStartingBidder  int          `json:"current_starting_bidder"`
+	CurrentStartingPlayer  int          `json:"current_starting_player"`
+	CurrentIsBidding       bool         `json:"current_is_bidding"`
+	CurrentPlayerTurn      int          `json:"current_player_turn"`
+	CurrentRoundRules      interface{}  `json:"current_round_rules"`
+	CurrentTeam1RoundScore int          `json:"current_team_1_round_score"`
+	CurrentTeam2RoundScore int          `json:"current_team_2_round_score"`
+	CurrentTeam1TotalScore int          `json:"current_team_1_total_score"`
+	CurrentTeam2TotalScore int          `json:"current_team_2_total_score"`
+	CurrentRoundHistory    []string     `json:"current_round_history"`
+	TotalRoundHistory      []string     `json:"total_round_history"`
 }
 
 type PlayerGameState struct {
 	GameState
-	PlayerDominoes []string `json:"player_dominoes"`
+	PlayerDominoes []DominoName `json:"player_dominoes"`
 }
 
 type GlobalGameState struct {
 	GameState
-	AllPlayerDominoes []string `json:"all_player_dominoes"`
+	HasStarted        bool
+	AllPlayerDominoes []DominoName
+	Team1PlayerIDs    []UserID
+	Team2PlayerIDs    []UserID
 }
+
+type GameMap map[InviteCode]*GlobalGameState
