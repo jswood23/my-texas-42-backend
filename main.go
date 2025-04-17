@@ -45,6 +45,7 @@ func main() {
 	r.DELETE("/friends/:username", auth.Authenticate, friends.RemoveFriendOrRequest)
 
 	r.GET("/games", auth.Authenticate, games.ListGames)
+	r.POST("/games", auth.Authenticate, games.NewGame)
 
 	r.GET("/ws", auth.Authenticate, sockets.Connect)
 
