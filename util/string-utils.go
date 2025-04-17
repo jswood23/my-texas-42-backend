@@ -1,6 +1,7 @@
 package util
 
 import (
+	"errors"
 	"math/rand"
 	"my-texas-42-backend/models"
 	"regexp"
@@ -69,4 +70,16 @@ func GenerateInviteCode() models.InviteCode {
 // IsInviteCodeValid checks if the invite code has 6 characters and is all uppercase letters
 func IsInviteCodeValid(inviteCode string) bool {
 	return regexp.MustCompile(`^[A-Z]{6}$`).MatchString(inviteCode)
+}
+
+func ValidatePrivacyLevel(privacyLevel string) (models.PrivacyLevel, error) {
+	validPrivacyLevels := []models.PrivacyLevel{models.PrivacyPublic, models.PrivacyPrivate, models.PrivacyFriends}
+
+	for _, validPrivacyLevel := range validPrivacyLevels {
+		if privacyLevel == string(validPrivacyLevel) {
+			return validPrivacyLevel, nil
+		}
+	}
+
+	return "", errors.New("invalid privacy level: " + privacyLevel)
 }

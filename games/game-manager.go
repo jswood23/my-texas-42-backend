@@ -27,7 +27,7 @@ func (gm *GameManager) GetAllGames() models.GameMap {
 	return gm.games
 }
 
-func (gm *GameManager) CreateNewGame(matchName string, matchPrivacy models.PrivacyLevel, rules []string, ownerUsername string) {
+func (gm *GameManager) CreateNewGame(matchName string, matchPrivacy models.PrivacyLevel, rules []string, ownerUsername string) *models.GlobalGameState {
 	game := &models.GlobalGameState{
 		GameState: models.GameState{
 			MatchInviteCode:        util.GenerateInviteCode(),
@@ -37,7 +37,7 @@ func (gm *GameManager) CreateNewGame(matchName string, matchPrivacy models.Priva
 			OwnerUsername:          ownerUsername,
 			Team1UserNames:         []string{ownerUsername},
 			Team2UserNames:         make([]string, 0),
-			IsConnected:            make([]bool, 0),
+			IsConnected:            []bool{false},
 			CurrentRound:           0,
 			CurrentStartingBidder:  0,
 			CurrentStartingPlayer:  0,
@@ -58,6 +58,8 @@ func (gm *GameManager) CreateNewGame(matchName string, matchPrivacy models.Priva
 	}
 
 	gm.addGame(game)
+
+	return game
 }
 
 func (gm *GameManager) addGame(game *models.GlobalGameState) {
