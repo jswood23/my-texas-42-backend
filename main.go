@@ -6,6 +6,7 @@ import (
 	"my-texas-42-backend/admin"
 	"my-texas-42-backend/auth"
 	"my-texas-42-backend/friends"
+	"my-texas-42-backend/games"
 	"my-texas-42-backend/logger"
 	"my-texas-42-backend/services"
 	"my-texas-42-backend/sockets"
@@ -42,6 +43,8 @@ func main() {
 	r.POST("/friends/:username", auth.Authenticate, friends.AddFriend)
 	r.POST("/friends/:username/accept", auth.Authenticate, friends.AcceptFriendRequest)
 	r.DELETE("/friends/:username", auth.Authenticate, friends.RemoveFriendOrRequest)
+
+	r.GET("/games", auth.Authenticate, games.ListGames)
 
 	r.GET("/ws", auth.Authenticate, sockets.Connect)
 

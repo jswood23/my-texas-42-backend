@@ -92,3 +92,17 @@ type WSIncomingMessageAPIModel struct {
 type WSSendChatMessageAPIModel struct {
 	Message string `json:"message"`
 }
+
+type GameAPIModel struct {
+	MatchName       string     `json:"match_name"`
+	MatchInviteCode InviteCode `json:"match_invite_code"`
+	Rules           []string   `json:"rules"`
+	Team1           []string   `json:"team1"`
+	Team2           []string   `json:"team2"`
+}
+
+type ListGamesAPIModel struct {
+	InGame       InviteCode     `json:"in_game"`
+	PublicGames  []GameAPIModel `json:"public_games"`
+	PrivateGames []GameAPIModel `json:"private_games"`
+}

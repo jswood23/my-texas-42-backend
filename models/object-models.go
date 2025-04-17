@@ -63,11 +63,18 @@ type DominoName string
 
 type PrivacyLevel string
 
+const (
+	PrivacyPublic  PrivacyLevel = "public"
+	PrivacyPrivate PrivacyLevel = "private"
+	PrivacyFriends PrivacyLevel = "friends"
+)
+
 type GameState struct {
 	MatchName              string       `json:"match_name"`
 	MatchInviteCode        InviteCode   `json:"match_invite_code"`
 	MatchPrivacy           PrivacyLevel `json:"match_privacy"`
 	Rules                  []string     `json:"rules"`
+	OwnerUsername          string       `json:"owner_username"`
 	Team1UserNames         []string     `json:"team_1"`
 	Team2UserNames         []string     `json:"team_2"`
 	IsConnected            []bool       `json:"is_connected"`
@@ -92,6 +99,7 @@ type PlayerGameState struct {
 
 type GlobalGameState struct {
 	GameState
+	HasStarted        bool
 	AllPlayerDominoes []DominoName
 	Team1PlayerIDs    []UserID
 	Team2PlayerIDs    []UserID
