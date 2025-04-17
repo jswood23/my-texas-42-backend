@@ -106,3 +106,9 @@ type ListGamesAPIModel struct {
 	PublicGames  []GameAPIModel `json:"public_games"`
 	PrivateGames []GameAPIModel `json:"private_games"`
 }
+
+type NewGameAPIModel struct {
+	MatchName string   `json:"match_name"`
+	Privacy   string   `json:"privacy"`
+	Rules     []string `json:"rules"`
+}

@@ -26,7 +26,6 @@ func ListGames(c *gin.Context) {
 	}
 
 	userCurrentGame := findUserCurrentGame(user.Username)
-	println("User current game: " + userCurrentGame)
 	if userCurrentGame != "" {
 		respBody.InGame = userCurrentGame
 		c.JSON(200, respBody)
@@ -37,7 +36,7 @@ func ListGames(c *gin.Context) {
 	query := sql_scripts.GetUserFriends(user.Username)
 	friendResult, err := services.Query[friendRow](query)
 	if err != nil {
-		c.JSON(500, gin.H{"Error getting user's friends: ": err.Error()})
+		c.JSON(500, gin.H{"error": `Error getting user's friends: ` + err.Error()})
 		return
 	}
 	var friendUsernames = []string{}
