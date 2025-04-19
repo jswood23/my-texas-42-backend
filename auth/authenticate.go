@@ -5,13 +5,55 @@ import (
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/services"
 	"my-texas-42-backend/sql_scripts"
+	"regexp"
 )
 
 func Authenticate(c *gin.Context) {
-	authenticateWithCognito(c, true)
+	requestPath := c.Request.RequestURI
+
+	pattern := `^/ws\?`
+	matched, err := regexp.MatchString(pattern, requestPath)
+	if err != nil {
+		c.AbortWithStatusJSON(500, gin.H{"error": "Error checking request path pattern"})
+		return
+	}
+
+	if matched {
+		authenticateWithUserSub(c, true)
+	} else {
+		authenticateWithAuthToken(c, true)
+	}
 }
 
-func authenticateWithCognito(c *gin.Context, abortIfNotAuthenticated bool) bool {
+func authenticateWithUserSub(c *gin.Context, abortIfNotAuthenticated bool) {
+	username := c.Query("username")
+	userSub := c.Query("sub")
+
+	if username == "" || userSub == "" {
+		if abortIfNotAuthenticated {
+			c.AbortWithStatusJSON(401, gin.H{"error": "No username or sub provided."})
+		}
+		return
+	}
+
+	query := sql_scripts.GetUserProfileByUserSub(username, userSub)
+	result, err := services.Query[models.UserModel](query)
+	if err != nil || len(result) == 0 {
+		if abortIfNotAuthenticated {
+			c.AbortWithStatusJSON(401, gin.H{"error": "Invalid username or sub."})
+		}
+		return
+	}
+
+	c.Set("user", result[0])
+	c.Set("sub", userSub)
+	c.Set("emailVerified", true)
+	c.Set("email", result[0].Email)
+
+	return
+}
+
+func authenticateWithAuthToken(c *gin.Context, abortIfNotAuthenticated bool) bool {
 	authToken := c.GetHeader("Authorization")
 	if authToken == "" {
 		if abortIfNotAuthenticated {

@@ -8,7 +8,7 @@ import (
 )
 
 func GetCurrentUser(c *gin.Context) {
-	isAuthenticated := authenticateWithCognito(c, false)
+	isAuthenticated := authenticateWithAuthToken(c, false)
 
 	if !isAuthenticated {
 		response := models.CurrentUserAPIModel{

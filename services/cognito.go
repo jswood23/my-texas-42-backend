@@ -34,7 +34,7 @@ func LoginCognito(username string, password string) (*cognitoidentityprovider.Au
 	return output.AuthenticationResult, nil
 }
 
-func SignUpCognito(email string, username string, password string) error {
+func SignUpCognito(email string, username string, password string) (string, error) {
 	provider := getCognitoProvider()
 
 	input := &cognitoidentityprovider.SignUpInput{
@@ -49,12 +49,12 @@ func SignUpCognito(email string, username string, password string) error {
 		},
 	}
 
-	_, err := provider.SignUp(input)
+	output, err := provider.SignUp(input)
 	if err != nil {
-		return fmt.Errorf("SignUpCognito error: %v", err)
+		return "", fmt.Errorf("SignUpCognito error: %v", err)
 	}
 
-	return nil
+	return *output.UserSub, nil
 }
 
 func ConfirmSignUpCognito(username string, confirmationCode string) (*cognitoidentityprovider.ConfirmSignUpOutput, error) {

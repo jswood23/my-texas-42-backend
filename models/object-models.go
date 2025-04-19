@@ -12,6 +12,7 @@ type UserModel struct {
 	Email       string `db:"email"`
 	IsAdmin     bool   `db:"isadmin"`
 	DisplayName string `db:"displayname"`
+	UserSub     string `db:"usersub"`
 }
 
 type UserStatsModel struct {

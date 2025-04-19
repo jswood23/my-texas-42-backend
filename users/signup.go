@@ -34,7 +34,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	err = services.SignUpCognito(request.Email, request.Username, request.Password)
+	userSub, err := services.SignUpCognito(request.Email, request.Username, request.Password)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"message": "Failed to create user auth.",
@@ -42,7 +42,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	query := sql_scripts.NewUser(request.Email, request.Username)
+	query := sql_scripts.NewUser(request.Email, request.Username, userSub)
 	err = services.Execute(query)
 	if err != nil {
 		c.JSON(500, gin.H{
