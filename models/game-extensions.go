@@ -90,7 +90,7 @@ func (game *GlobalGameState) GetPlayerGameState(username string) *PlayerGameStat
 		}
 	}
 
-	isInTeam2, i := teamContains(game.Team1UserNames, username)
+	isInTeam2, i := teamContains(game.Team2UserNames, username)
 	if isInTeam2 {
 		return &PlayerGameState{
 			GameState:      game.GameState,

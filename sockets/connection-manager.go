@@ -85,8 +85,8 @@ func (cm *ConnectionManager) BroadcastMessage(message models.WSOutgoingMessageAP
 	}
 }
 
-// HandleIncomingMessages handles incoming messages from a specific user.
-func (cm *ConnectionManager) HandleIncomingMessages(username string) {
+// handleIncomingMessages handles incoming messages from a specific user.
+func (cm *ConnectionManager) handleIncomingMessages(username string) {
 	cm.mu.Lock()
 	conn, ok := cm.connections[username]
 	cm.mu.Unlock()
@@ -101,7 +101,6 @@ func (cm *ConnectionManager) HandleIncomingMessages(username string) {
 			break
 		}
 
-		// TODO: Process the message (e.g., broadcast it, handle commands, etc.)
 		var result models.WSIncomingMessageAPIModel
 		err = json.Unmarshal(message, &result)
 
@@ -119,8 +118,8 @@ func (cm *ConnectionManager) HandleIncomingMessages(username string) {
 			games.HandleChatMessage(username, data)
 		} else if result.Action == "play_turn" {
 			println("play turn")
-		} else if result.Action == "refresh_player_game" {
-			println("refresh player game")
+		} else if result.Action == "refresh_player_game_state" {
+			refreshGameStateForPlayer(cm, username)
 		} else if result.Action == "switch_teams" {
 			println("switch teams")
 		}

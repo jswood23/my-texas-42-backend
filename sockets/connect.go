@@ -47,7 +47,7 @@ func Connect(c *gin.Context) {
 		return
 	}
 
-	manager.HandleIncomingMessages(user.Username)
+	manager.handleIncomingMessages(user.Username)
 }
 
 func closeConnection(conn *websocket.Conn) {
@@ -72,6 +72,7 @@ func addPlayerToGame(c *gin.Context) error {
 	game := games.GetGameManager().GetGameByInviteCode(matchInviteCode)
 
 	if game.ContainsPlayer(username) {
+		messagePlayersInGame(game, models.WSMessageTypeChat, username+" reconnected.")
 		game.ConnectDisconnectedPlayer(username)
 		return nil
 	}
@@ -81,14 +82,7 @@ func addPlayerToGame(c *gin.Context) error {
 		return err
 	}
 
-	message := models.WSOutgoingMessageAPIModel{
-		MessageType: models.WSMessageTypeGameUpdate,
-		Message:     username + " connected.",
-		Username:    "(System)",
-		GameData:    game.GetPlayerGameState(username),
-	}
-
-	GetConnectionManager().SendMessageToGame(message, *game)
+	messagePlayersInGame(game, models.WSMessageTypeChat, username+" joined the game.")
 
 	return nil
 }

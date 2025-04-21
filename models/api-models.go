@@ -78,10 +78,10 @@ type OtherUserProfileAPIModel struct {
 }
 
 type WSOutgoingMessageAPIModel struct {
-	MessageType string           `json:"messagetype"`
+	MessageType string           `json:"message_type"`
 	Message     string           `json:"message"`
 	Username    string           `json:"username"`
-	GameData    *PlayerGameState `json:"gamedata"`
+	GameData    *PlayerGameState `json:"game_data"`
 }
 
 type WSIncomingMessageAPIModel struct {
