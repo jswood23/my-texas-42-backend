@@ -1,11 +1,16 @@
 package sockets
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"log"
+	"my-texas-42-backend/games"
+	"my-texas-42-backend/logger"
+	"my-texas-42-backend/models"
 	"my-texas-42-backend/util"
 	"net/http"
+	"strconv"
 )
 
 var upgrader = websocket.Upgrader{
@@ -24,7 +29,7 @@ func Connect(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "Failed to upgrade connection to websocket"})
 		return
 	}
-	defer conn.Close()
+	defer closeConnection(conn)
 
 	user, err := util.GetRequestUser(c)
 	if err != nil {
@@ -32,8 +37,88 @@ func Connect(c *gin.Context) {
 		return
 	}
 
-	manager.AddConnection(user.UserID, conn)
-	defer manager.RemoveConnection(user.UserID)
+	manager.AddConnection(user.Username, conn)
+	defer disconnectPlayer(user)
 
-	manager.HandleIncomingMessages(user.UserID)
+	err = addPlayerToGame(c)
+
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	manager.HandleIncomingMessages(user.Username)
+}
+
+func closeConnection(conn *websocket.Conn) {
+	err := conn.Close()
+	if err != nil {
+		logger.Error("Failed to close ws connection: " + err.Error())
+	}
+}
+
+func addPlayerToGame(c *gin.Context) error {
+	var matchInviteCode = models.InviteCode(c.Query("match_invite_code"))
+	username := c.Query("username")
+	teamNumber, err := strconv.Atoi(c.Query("team_number"))
+	if err != nil {
+		return errors.New("invalid team number")
+	}
+
+	if matchInviteCode == "" {
+		return errors.New("match invite code is required")
+	}
+
+	game := games.GetGameManager().GetGameByInviteCode(matchInviteCode)
+
+	if game.ContainsPlayer(username) {
+		game.ConnectDisconnectedPlayer(username)
+		return nil
+	}
+
+	err = game.AddPlayer(username, teamNumber)
+	if err != nil {
+		return err
+	}
+
+	message := models.WSOutgoingMessageAPIModel{
+		MessageType: models.WSMessageTypeGameUpdate,
+		Message:     username + " connected.",
+		Username:    "(System)",
+		GameData:    game.GetPlayerGameState(username),
+	}
+
+	GetConnectionManager().SendMessageToGame(message, *game)
+
+	return nil
+}
+
+func disconnectPlayer(user *models.UserModel) {
+	manager.RemoveConnection(user.Username)
+
+	game, err := games.GetGameManager().GetGameByUsername(user.Username)
+	if err != nil {
+		logger.Error("Failed to disconnect player " + user.Username + " from game: " + err.Error())
+		return
+	}
+
+	game.DisconnectPlayer(user.Username)
+
+	sendDisconnectedUserMessageToRemainingPlayers(game, user.Username)
+}
+
+func sendDisconnectedUserMessageToRemainingPlayers(game *models.GlobalGameState, username string) {
+	allPlayers := game.GetAllUsernames()
+
+	for _, player := range allPlayers {
+		if player != username {
+			message := models.WSOutgoingMessageAPIModel{
+				MessageType: models.WSMessageTypeGameUpdate,
+				Message:     username + " disconnected.",
+				Username:    "(System)",
+				GameData:    game.GetPlayerGameState(player),
+			}
+			_ = GetConnectionManager().SendMessage(player, message)
+		}
+	}
 }

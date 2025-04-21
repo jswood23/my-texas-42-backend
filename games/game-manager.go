@@ -37,7 +37,8 @@ func (gm *GameManager) CreateNewGame(matchName string, matchPrivacy models.Priva
 			OwnerUsername:          ownerUsername,
 			Team1UserNames:         []string{ownerUsername},
 			Team2UserNames:         make([]string, 0),
-			IsConnected:            []bool{false},
+			Team1Connected:         []bool{false},
+			Team2Connected:         make([]bool, 0),
 			CurrentRound:           0,
 			CurrentStartingBidder:  0,
 			CurrentStartingPlayer:  0,
@@ -52,9 +53,7 @@ func (gm *GameManager) CreateNewGame(matchName string, matchPrivacy models.Priva
 			TotalRoundHistory:      make([]string, 0),
 		},
 		HasStarted:        false,
-		AllPlayerDominoes: make([]models.DominoName, 0),
-		Team1PlayerIDs:    make([]models.UserID, 0),
-		Team2PlayerIDs:    make([]models.UserID, 0),
+		AllPlayerDominoes: [2][2][]models.DominoName{},
 	}
 
 	gm.addGame(game)
@@ -82,15 +81,15 @@ func (gm *GameManager) GetGameByInviteCode(inviteCode models.InviteCode) *models
 	return gm.games[inviteCode]
 }
 
-func (gm *GameManager) GetGameByUserID(userID models.UserID) (*models.GlobalGameState, error) {
+func (gm *GameManager) GetGameByUsername(username string) (*models.GlobalGameState, error) {
 	for _, game := range gm.games {
-		for _, playerID := range game.Team1PlayerIDs {
-			if playerID == userID {
+		for _, playerUsername := range game.GameState.Team1UserNames {
+			if playerUsername == username {
 				return game, nil
 			}
 		}
-		for _, playerID := range game.Team2PlayerIDs {
-			if playerID == userID {
+		for _, playerUsername := range game.GameState.Team2UserNames {
+			if playerUsername == username {
 				return game, nil
 			}
 		}

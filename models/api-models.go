@@ -78,10 +78,10 @@ type OtherUserProfileAPIModel struct {
 }
 
 type WSOutgoingMessageAPIModel struct {
-	MessageType string          `json:"messagetype"`
-	Message     string          `json:"message"`
-	Username    string          `json:"username"`
-	GameData    PlayerGameState `json:"gamedata"`
+	MessageType string           `json:"messagetype"`
+	Message     string           `json:"message"`
+	Username    string           `json:"username"`
+	GameData    *PlayerGameState `json:"gamedata"`
 }
 
 type WSIncomingMessageAPIModel struct {
@@ -93,12 +93,18 @@ type WSSendChatMessageAPIModel struct {
 	Message string `json:"message"`
 }
 
+const (
+	WSMessageTypeChat       = "chat"
+	WSMessageTypeGameUpdate = "game-update"
+	WSMessageTypeGameError  = "game-error"
+)
+
 type GameAPIModel struct {
 	MatchName       string     `json:"match_name"`
 	MatchInviteCode InviteCode `json:"match_invite_code"`
 	Rules           []string   `json:"rules"`
-	Team1           []string   `json:"team1"`
-	Team2           []string   `json:"team2"`
+	Team1           []string   `json:"team_1"`
+	Team2           []string   `json:"team_2"`
 }
 
 type ListGamesAPIModel struct {

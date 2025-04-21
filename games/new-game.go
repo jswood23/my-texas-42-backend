@@ -15,13 +15,12 @@ func NewGame(c *gin.Context) {
 
 	// Verify that the user is not already in a game
 	userCurrentGame := findUserCurrentGame(user.Username)
-	println("User current game: " + userCurrentGame)
 	if userCurrentGame != "" {
 		c.JSON(400, gin.H{"error": "User is already in a game"})
 		return
 	}
 
-	request, err := models.DecodeAPIModel[models.NewGameAPIModel](c.Request.Body)
+	request, err := models.DecodeAPIModel[models.NewGameAPIModel](c.Request.Body) // todo: match name and privacy are not populating correctly
 
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Invalid request body"})

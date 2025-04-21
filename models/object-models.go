@@ -49,7 +49,7 @@ type FriendModel struct {
 	User2ID   UserID `db:"user2id"`
 }
 
-type ConnectionMap map[UserID]*websocket.Conn
+type ConnectionMap map[string]*websocket.Conn // the string is a username
 
 type RoundRules struct {
 	Bid         int    `json:"bid"`
@@ -78,7 +78,8 @@ type GameState struct {
 	OwnerUsername          string       `json:"owner_username"`
 	Team1UserNames         []string     `json:"team_1"`
 	Team2UserNames         []string     `json:"team_2"`
-	IsConnected            []bool       `json:"is_connected"`
+	Team1Connected         []bool       `json:"team_1_connected"`
+	Team2Connected         []bool       `json:"team_2_connected"`
 	CurrentRound           int          `json:"current_round"`
 	CurrentStartingBidder  int          `json:"current_starting_bidder"`
 	CurrentStartingPlayer  int          `json:"current_starting_player"`
@@ -101,9 +102,7 @@ type PlayerGameState struct {
 type GlobalGameState struct {
 	GameState
 	HasStarted        bool
-	AllPlayerDominoes []DominoName
-	Team1PlayerIDs    []UserID
-	Team2PlayerIDs    []UserID
+	AllPlayerDominoes [2][2][]DominoName
 }
 
 type GameMap map[InviteCode]*GlobalGameState

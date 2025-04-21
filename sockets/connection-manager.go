@@ -7,7 +7,6 @@ import (
 	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/util"
-	"strconv"
 	"sync"
 )
 
@@ -25,32 +24,32 @@ func GetConnectionManager() *ConnectionManager {
 }
 
 // AddConnection adds a new WebSocket connection with the associated user ID.
-func (cm *ConnectionManager) AddConnection(userID models.UserID, conn *websocket.Conn) {
+func (cm *ConnectionManager) AddConnection(username string, conn *websocket.Conn) {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
-	cm.connections[userID] = conn
+	cm.connections[username] = conn
 }
 
 // RemoveConnection removes a WebSocket connection by user ID.
-func (cm *ConnectionManager) RemoveConnection(userID models.UserID) {
+func (cm *ConnectionManager) RemoveConnection(username string) {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
-	if conn, ok := cm.connections[userID]; ok {
+	if conn, ok := cm.connections[username]; ok {
 		err := conn.Close()
 
 		if err != nil {
 			logger.Error("Failed to close ws connection: " + err.Error())
 		}
 
-		delete(cm.connections, userID)
+		delete(cm.connections, username)
 	}
 }
 
 // SendMessage sends a message to a specific user by user ID.
-func (cm *ConnectionManager) SendMessage(userID models.UserID, message models.WSOutgoingMessageAPIModel) error {
+func (cm *ConnectionManager) SendMessage(username string, message models.WSOutgoingMessageAPIModel) error {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
-	if conn, ok := cm.connections[userID]; ok {
+	if conn, ok := cm.connections[username]; ok {
 		messageByte, _ := json.Marshal(message)
 		return conn.WriteMessage(websocket.TextMessage, messageByte)
 	}
@@ -60,13 +59,13 @@ func (cm *ConnectionManager) SendMessage(userID models.UserID, message models.WS
 func (cm *ConnectionManager) SendMessageToGame(message models.WSOutgoingMessageAPIModel, game models.GlobalGameState) {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
-	for _, playerID := range append(game.Team1PlayerIDs, game.Team2PlayerIDs...) {
-		if conn, ok := cm.connections[playerID]; ok {
+	for _, playerUsername := range append(game.GameState.Team1UserNames, game.GameState.Team2UserNames...) {
+		if conn, ok := cm.connections[playerUsername]; ok {
 			messageByte, _ := json.Marshal(message)
 			err := conn.WriteMessage(websocket.TextMessage, messageByte)
 
 			if err != nil {
-				logger.Error("Failed to send ws message to user with ID " + strconv.Itoa(int(playerID)) + ": " + err.Error())
+				logger.Error("Failed to send ws message to user " + playerUsername + ": " + err.Error())
 			}
 		}
 	}
@@ -87,9 +86,9 @@ func (cm *ConnectionManager) BroadcastMessage(message models.WSOutgoingMessageAP
 }
 
 // HandleIncomingMessages handles incoming messages from a specific user.
-func (cm *ConnectionManager) HandleIncomingMessages(userID models.UserID) {
+func (cm *ConnectionManager) HandleIncomingMessages(username string) {
 	cm.mu.Lock()
-	conn, ok := cm.connections[userID]
+	conn, ok := cm.connections[username]
 	cm.mu.Unlock()
 	if !ok {
 		return
@@ -98,7 +97,7 @@ func (cm *ConnectionManager) HandleIncomingMessages(userID models.UserID) {
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
-			cm.RemoveConnection(userID)
+			cm.RemoveConnection(username)
 			break
 		}
 
@@ -117,7 +116,7 @@ func (cm *ConnectionManager) HandleIncomingMessages(userID models.UserID) {
 				continue
 			}
 
-			games.HandleChatMessage(userID, data)
+			games.HandleChatMessage(username, data)
 		} else if result.Action == "play_turn" {
 			println("play turn")
 		} else if result.Action == "refresh_player_game" {

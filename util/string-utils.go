@@ -29,7 +29,7 @@ func greaterThanChar(input string, min int) bool {
 	return len(input) >= min
 }
 
-func SliceContains(slice []string, item string) bool {
+func StringSliceContains(slice []string, item string) bool {
 	for _, v := range slice {
 		if v == item {
 			return true
