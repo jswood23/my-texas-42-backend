@@ -27,7 +27,7 @@ func (gm *GameManager) GetAllGames() models.GameMap {
 	return gm.games
 }
 
-func (gm *GameManager) CreateNewGame(matchName string, matchPrivacy models.PrivacyLevel, rules []string, ownerUsername string) *models.GlobalGameState {
+func (gm *GameManager) CreateNewGame(matchId int, matchName string, matchPrivacy models.PrivacyLevel, rules []string, ownerUsername string) *models.GlobalGameState {
 	game := &models.GlobalGameState{
 		GameState: models.GameState{
 			MatchInviteCode:        util.GenerateInviteCode(),
@@ -54,6 +54,7 @@ func (gm *GameManager) CreateNewGame(matchName string, matchPrivacy models.Priva
 		},
 		HasStarted:        false,
 		AllPlayerDominoes: [2][2][]models.DominoName{},
+		MatchId:           matchId,
 	}
 
 	gm.addGame(game)

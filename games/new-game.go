@@ -3,6 +3,8 @@ package games
 import (
 	"github.com/gin-gonic/gin"
 	"my-texas-42-backend/models"
+	"my-texas-42-backend/services"
+	"my-texas-42-backend/sql_scripts"
 	"my-texas-42-backend/util"
 )
 
@@ -29,7 +31,29 @@ func NewGame(c *gin.Context) {
 
 	privacyLevel, err := util.ValidatePrivacyLevel(request.Privacy)
 
-	newGame := GetGameManager().CreateNewGame(request.MatchName, privacyLevel, request.Rules, user.Username)
+	type matchIdResponse struct {
+		MatchId int `db:"matchid"`
+	}
+
+	rulesString := ""
+	for i, rule := range request.Rules {
+		rulesString += rule
+		if i < len(request.Rules)-1 {
+			rulesString += ", "
+		}
+	}
+	query := sql_scripts.NewMatch(request.MatchName, string(privacyLevel), rulesString, user.Username)
+	response, err := services.Query[matchIdResponse](query)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	if len(response) == 0 {
+		c.JSON(500, gin.H{"error": "Failed to create match"})
+		return
+	}
+
+	newGame := GetGameManager().CreateNewGame(response[0].MatchId, request.MatchName, privacyLevel, request.Rules, user.Username)
 
 	respBody := models.GameAPIModel{
 		MatchName:       newGame.GameState.MatchName,

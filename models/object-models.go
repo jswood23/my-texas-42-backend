@@ -103,6 +103,7 @@ type GlobalGameState struct {
 	GameState
 	HasStarted        bool
 	AllPlayerDominoes [2][2][]DominoName
+	MatchId           int
 }
 
 type GameMap map[InviteCode]*GlobalGameState
