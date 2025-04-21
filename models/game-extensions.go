@@ -122,3 +122,41 @@ func (game *GlobalGameState) GetAllConnectedUsernames() []string {
 	}
 	return allUsernames
 }
+
+func (game *GlobalGameState) SwitchPlayerTeam(username string) error {
+	isInTeam1, i := teamContains(game.Team1UserNames, username)
+	if isInTeam1 {
+		if len(game.Team2UserNames) >= 2 {
+			return errors.New("team 2 is full")
+		}
+
+		// remove player from team 1
+		game.Team1UserNames = append(game.Team1UserNames[:i], game.Team1UserNames[i+1:]...)
+		game.Team1Connected = append(game.Team1Connected[:i], game.Team1Connected[i+1:]...)
+
+		// add player to team 2
+		game.Team2UserNames = append(game.Team2UserNames, username)
+		game.Team2Connected = append(game.Team2Connected, true)
+
+		return nil
+	}
+
+	isInTeam2, i := teamContains(game.Team2UserNames, username)
+	if !isInTeam2 {
+		return errors.New("player not in any team")
+	}
+
+	if len(game.Team1UserNames) >= 2 {
+		return errors.New("team 1 is full")
+	}
+
+	// remove player from team 2
+	game.Team2UserNames = append(game.Team2UserNames[:i], game.Team2UserNames[i+1:]...)
+	game.Team2Connected = append(game.Team2Connected[:i], game.Team2Connected[i+1:]...)
+
+	// add player to team 1
+	game.Team1UserNames = append(game.Team1UserNames, username)
+	game.Team1Connected = append(game.Team1Connected, true)
+
+	return nil
+}

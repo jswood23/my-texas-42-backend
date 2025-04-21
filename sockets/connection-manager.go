@@ -121,7 +121,7 @@ func (cm *ConnectionManager) handleIncomingMessages(username string) {
 		} else if result.Action == "refresh_player_game_state" {
 			refreshGameStateForPlayer(cm, username)
 		} else if result.Action == "switch_teams" {
-			println("switch teams")
+			switchPlayerTeam(cm, username)
 		}
 	}
 }
