@@ -102,23 +102,7 @@ func disconnectPlayer(user *models.UserModel) {
 		return
 	}
 
-	game.DisconnectPlayer(user.Username)
+	game.SetPlayerAsDisconnected(user.Username)
 
-	sendDisconnectedUserMessageToRemainingPlayers(game, user.Username)
-}
-
-func sendDisconnectedUserMessageToRemainingPlayers(game *models.GlobalGameState, username string) {
-	allPlayers := game.GetAllUsernames()
-
-	for _, player := range allPlayers {
-		if player != username {
-			message := models.WSOutgoingMessageAPIModel{
-				MessageType: models.WSMessageTypeGameUpdate,
-				Message:     username + " disconnected.",
-				Username:    "(System)",
-				GameData:    game.GetPlayerGameState(player),
-			}
-			_ = GetConnectionManager().SendMessage(player, message)
-		}
-	}
+	messagePlayersInGame(game, models.WSMessageTypeChat, user.Username+" disconnected.")
 }

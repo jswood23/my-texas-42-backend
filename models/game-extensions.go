@@ -39,7 +39,7 @@ func (game *GlobalGameState) ConnectDisconnectedPlayer(username string) {
 	}
 }
 
-func (game *GlobalGameState) DisconnectPlayer(username string) {
+func (game *GlobalGameState) SetPlayerAsDisconnected(username string) {
 	isInTeam1, _ := teamContains(game.Team1UserNames, username)
 	if isInTeam1 {
 		for i, player := range game.Team1UserNames {
@@ -105,5 +105,20 @@ func (game *GlobalGameState) GetAllUsernames() []string {
 	allUsernames := make([]string, 0, len(game.Team1UserNames)+len(game.Team2UserNames))
 	allUsernames = append(allUsernames, game.Team1UserNames...)
 	allUsernames = append(allUsernames, game.Team2UserNames...)
+	return allUsernames
+}
+
+func (game *GlobalGameState) GetAllConnectedUsernames() []string {
+	allUsernames := make([]string, 0, len(game.Team1UserNames)+len(game.Team2UserNames))
+	for i, player := range game.Team1UserNames {
+		if game.Team1Connected[i] {
+			allUsernames = append(allUsernames, player)
+		}
+	}
+	for i, player := range game.Team2UserNames {
+		if game.Team2Connected[i] {
+			allUsernames = append(allUsernames, player)
+		}
+	}
 	return allUsernames
 }
