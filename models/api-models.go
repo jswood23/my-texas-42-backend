@@ -85,8 +85,8 @@ type WSOutgoingMessageAPIModel struct {
 }
 
 type WSIncomingMessageAPIModel struct {
-	Action string                 `json:"action"`
-	Data   map[string]interface{} `json:"data"`
+	Action string `json:"action"`
+	Data   string `json:"data"`
 }
 
 type WSSendChatMessageAPIModel struct {

@@ -3,10 +3,8 @@ package sockets
 import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
-	"my-texas-42-backend/games"
 	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
-	"my-texas-42-backend/util"
 	"sync"
 )
 
@@ -56,7 +54,7 @@ func (cm *ConnectionManager) SendMessage(username string, message models.WSOutgo
 	return nil
 }
 
-func (cm *ConnectionManager) SendMessageToGame(message models.WSOutgoingMessageAPIModel, game models.GlobalGameState) {
+func (cm *ConnectionManager) SendMessageToGame(message models.WSOutgoingMessageAPIModel, game *models.GlobalGameState) {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
 	for _, playerUsername := range append(game.GameState.Team1UserNames, game.GameState.Team2UserNames...) {
@@ -109,13 +107,15 @@ func (cm *ConnectionManager) handleIncomingMessages(username string) {
 		}
 
 		if result.Action == "send_chat_message" {
-			data, err := util.ConvertStringMapToType[models.WSSendChatMessageAPIModel](result.Data)
+			var data models.WSSendChatMessageAPIModel
+			err = json.Unmarshal([]byte(result.Data), &data)
+
 			if err != nil {
-				logger.Error("Failed to cast data to WSSendChatMessageAPIModel: " + err.Error())
+				logger.Error("Failed to unmarshal chat message data: " + err.Error() + "\n" + result.Data)
 				continue
 			}
 
-			games.HandleChatMessage(username, data)
+			handleChatMessage(cm, username, data)
 		} else if result.Action == "play_turn" {
 			println("play turn")
 		} else if result.Action == "refresh_player_game_state" {
