@@ -83,20 +83,21 @@ type GameState struct {
 	CurrentRound           int          `json:"current_round"`
 	CurrentStartingBidder  int          `json:"current_starting_bidder"`
 	CurrentStartingPlayer  int          `json:"current_starting_player"`
-	CurrentIsBidding       bool         `json:"current_is_bidding"`
+	IsInBidding            bool         `json:"current_is_bidding"`
 	CurrentPlayerTurn      int          `json:"current_player_turn"`
-	CurrentRoundRules      interface{}  `json:"current_round_rules"`
-	CurrentTeam1RoundScore int          `json:"current_team_1_round_score"`
-	CurrentTeam2RoundScore int          `json:"current_team_2_round_score"`
+	RoundRules             RoundRules   `json:"current_round_rules"`
+	Team1RoundScore        int          `json:"current_team_1_round_score"`
+	Team2RoundScore        int          `json:"current_team_2_round_score"`
 	CurrentTeam1TotalScore int          `json:"current_team_1_total_score"`
 	CurrentTeam2TotalScore int          `json:"current_team_2_total_score"`
-	CurrentRoundHistory    []string     `json:"current_round_history"`
+	RoundHistory           []string     `json:"current_round_history"`
 	TotalRoundHistory      []string     `json:"total_round_history"`
 }
 
 type PlayerGameState struct {
 	GameState
 	PlayerDominoes []DominoName `json:"player_dominoes"`
+	HasStarted     bool         `json:"has_started"`
 }
 
 type GlobalGameState struct {

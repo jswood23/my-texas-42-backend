@@ -40,11 +40,15 @@ func Connect(c *gin.Context) {
 	manager.AddConnection(user.Username, conn)
 	defer disconnectPlayer(user)
 
-	err = addPlayerToGame(c)
+	game, err := addPlayerToGame(c)
 
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
+	}
+
+	if game.IsFull() && game.HasAllPlayersConnected() && !game.HasStarted {
+		startGame(game)
 	}
 
 	manager.handleIncomingMessages(user.Username)
@@ -57,16 +61,16 @@ func closeConnection(conn *websocket.Conn) {
 	}
 }
 
-func addPlayerToGame(c *gin.Context) error {
+func addPlayerToGame(c *gin.Context) (*models.GlobalGameState, error) {
 	var matchInviteCode = models.InviteCode(c.Query("match_invite_code"))
 	username := c.Query("username")
 	teamNumber, err := strconv.Atoi(c.Query("team_number"))
 	if err != nil {
-		return errors.New("invalid team number")
+		return nil, errors.New("invalid team number")
 	}
 
 	if matchInviteCode == "" {
-		return errors.New("match invite code is required")
+		return nil, errors.New("match invite code is required")
 	}
 
 	game := games.GetGameManager().GetGameByInviteCode(matchInviteCode)
@@ -74,17 +78,17 @@ func addPlayerToGame(c *gin.Context) error {
 	if game.ContainsPlayer(username) {
 		messagePlayersInGame(game, models.WSMessageTypeChat, username+" reconnected.")
 		game.ConnectDisconnectedPlayer(username)
-		return nil
+		return game, nil
 	}
 
 	err = game.AddPlayer(username, teamNumber)
 	if err != nil {
-		return err
+		return game, err
 	}
 
 	messagePlayersInGame(game, models.WSMessageTypeChat, username+" joined the game.")
 
-	return nil
+	return game, nil
 }
 
 func disconnectPlayer(user *models.UserModel) {
@@ -98,5 +102,19 @@ func disconnectPlayer(user *models.UserModel) {
 
 	game.SetPlayerAsDisconnected(user.Username)
 
+	if game.HasAllPlayersDisconnected() {
+		logger.Info("All players have disconnected from game ID " + strconv.Itoa(game.MatchId) + ". Removing game.")
+		games.GetGameManager().RemoveGame(game.MatchInviteCode)
+	}
+
 	messagePlayersInGame(game, models.WSMessageTypeChat, user.Username+" disconnected.")
+}
+
+func startGame(game *models.GlobalGameState) {
+	if game.HasStarted {
+		return
+	}
+
+	game.StartNextRound()
+	messagePlayersInGame(game, models.WSMessageTypeGameUpdate, "The game is starting.")
 }

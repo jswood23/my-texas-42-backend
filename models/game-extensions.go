@@ -1,6 +1,32 @@
 package models
 
-import "errors"
+import (
+	"errors"
+	"math/rand"
+	"strconv"
+)
+
+const (
+	RuleNoForcedBid    = "No forced bid"
+	RuleForced31Bid    = "Forced 31 bid"
+	RuleForcedNil      = "Forced Nil"
+	RuleNil2Mark       = "2-mark Nil"
+	RuleSplash2Mark    = "2-mark Splash"
+	RulePlunge2Mark    = "2-mark Plunge"
+	RuleSevens2Mark    = "2-mark Sevens"
+	RuleDelve          = "Delve"
+	RuleNil            = "Nil"
+	RuleSplash         = "Splash"
+	RulePlunge         = "Plunge"
+	RuleSevens         = "Sevens"
+	RuleDoublesHigh    = "Doubles-high"
+	RuleDoublesLow     = "Doubles-low"
+	RuleDoublesOwnSuit = "Doubles-own-suit"
+	RuleDoublesTrump   = "Doubles-trump"
+	RuleFollowMe       = "Follow-me"
+	RuleUndecided      = "Undecided"
+	RuleNoVariant      = ""
+)
 
 func (game *GlobalGameState) ContainsPlayer(username string) bool {
 	isInTeam1, _ := teamContains(game.Team1UserNames, username)
@@ -87,6 +113,7 @@ func (game *GlobalGameState) GetPlayerGameState(username string) *PlayerGameStat
 		return &PlayerGameState{
 			GameState:      game.GameState,
 			PlayerDominoes: game.AllPlayerDominoes[0][i],
+			HasStarted:     game.HasStarted,
 		}
 	}
 
@@ -95,6 +122,7 @@ func (game *GlobalGameState) GetPlayerGameState(username string) *PlayerGameStat
 		return &PlayerGameState{
 			GameState:      game.GameState,
 			PlayerDominoes: game.AllPlayerDominoes[1][i],
+			HasStarted:     game.HasStarted,
 		}
 	}
 
@@ -159,4 +187,94 @@ func (game *GlobalGameState) SwitchPlayerTeam(username string) error {
 	game.Team1Connected = append(game.Team1Connected, true)
 
 	return nil
+}
+
+func (game *GlobalGameState) IsFull() bool {
+	return len(game.Team1UserNames) == 2 && len(game.Team2UserNames) == 2
+}
+
+func (game *GlobalGameState) HasAllPlayersConnected() bool {
+	for _, connected := range game.Team1Connected {
+		if !connected {
+			return false
+		}
+	}
+	for _, connected := range game.Team2Connected {
+		if !connected {
+			return false
+		}
+	}
+	return true
+}
+
+func (game *GlobalGameState) HasAllPlayersDisconnected() bool {
+	for _, connected := range game.Team1Connected {
+		if connected {
+			return false
+		}
+	}
+	for _, connected := range game.Team2Connected {
+		if connected {
+			return false
+		}
+	}
+	return true
+}
+
+func (game *GlobalGameState) StartNextRound() {
+	game.HasStarted = true
+
+	gameState := &game.GameState
+	gameState.RoundRules = RoundRules{
+		Bid:         0,
+		BiddingTeam: 0,
+		Trump:       RuleUndecided,
+		Variant:     RuleNoVariant,
+	}
+
+	var startingPlayer int
+	if gameState.CurrentRound == 0 {
+		startingPlayer = rand.Intn(4)
+	} else {
+		startingPlayer = (gameState.CurrentStartingBidder + 1) % 4
+	}
+	gameState.CurrentStartingBidder = startingPlayer
+	gameState.CurrentStartingPlayer = startingPlayer
+	gameState.CurrentPlayerTurn = startingPlayer
+
+	gameState.IsInBidding = true
+	gameState.CurrentRound++
+
+	gameState.Team1RoundScore = 0
+	gameState.Team2RoundScore = 0
+	gameState.RoundHistory = []string{}
+
+	game.AssignDominoes()
+}
+
+func (game *GlobalGameState) AssignDominoes() {
+	// make a list of all dominoes in a double 6 set
+	dominoes := make([]DominoName, 0, 28)
+	for i := 0; i <= 6; i++ {
+		for j := i; j <= 6; j++ {
+			dominoes = append(dominoes, DominoName(strconv.Itoa(j)+":"+strconv.Itoa(i)))
+		}
+	}
+
+	// shuffle the dominoes
+	rand.Shuffle(len(dominoes), func(i, j int) {
+		dominoes[i], dominoes[j] = dominoes[j], dominoes[i]
+	})
+
+	// assign dominoes to players
+	game.AllPlayerDominoes = [2][2][]DominoName{
+		{
+			dominoes[0:7],
+			dominoes[7:14],
+		},
+		{
+			dominoes[14:21],
+			dominoes[21:28],
+		},
+	}
 }
