@@ -34,6 +34,7 @@ func main() {
 
 	r.POST("/users", users.Signup)
 	r.PUT("/users/confirm", users.ConfirmSignup)
+	r.POST("/users/resend-confirmation", users.ResendConfirmation)
 	r.POST("/users/login", users.Login)
 	r.GET("/users/current", auth.GetCurrentUser)
 	r.PUT("/users/change-password", auth.Authenticate, users.ChangePassword)

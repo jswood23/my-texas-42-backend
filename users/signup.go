@@ -70,11 +70,35 @@ func ConfirmSignup(c *gin.Context) {
 	if err != nil {
 		c.JSON(400, gin.H{
 			"message": "Failed to confirm user.",
+			"reason":  err.Error(),
 		})
 		return
 	}
 
 	c.JSON(200, gin.H{
 		"message": "User confirmed.",
+	})
+}
+
+func ResendConfirmation(c *gin.Context) {
+	request, err := models.DecodeAPIModel[models.ResendConfirmationCodeAPIModel](c.Request.Body)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "Invalid request body.",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
+	err = services.ResendConfirmationCodeCognito(request.Username)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "Failed to resend confirmation code.",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Confirmation code resent.",
 	})
 }

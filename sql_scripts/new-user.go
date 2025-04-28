@@ -10,9 +10,9 @@ func NewUser(email string, username string, usersub string) string {
 
 	return fmt.Sprintf(`
 INSERT INTO public.Users (Email, Username, IsAdmin, DisplayName, UserSub)
-VALUES ('%s', '%s', FALSE, '%s');
+VALUES ('%s', '%s', FALSE, '%s', '%s');
 INSERT INTO public.UserStats (UserId)
 SELECT UserID FROM public.Users
 WHERE Username = '%s';
-`, sanitizedEmail, sanitizedUsername, sanitizedUsername, sanitizedUserSub)
+`, sanitizedEmail, sanitizedUsername, sanitizedUsername, sanitizedUserSub, sanitizedUsername)
 }
