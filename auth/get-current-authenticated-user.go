@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 	"github.com/gin-gonic/gin"
 	"my-texas-42-backend/models"
-	"my-texas-42-backend/util"
+	"my-texas-42-backend/request-util"
 )
 
 func GetCurrentUser(c *gin.Context) {
@@ -26,7 +26,7 @@ func GetCurrentUser(c *gin.Context) {
 		return
 	}
 
-	user, err := util.GetRequestUser(c)
+	user, err := request_util.GetRequestUser(c)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

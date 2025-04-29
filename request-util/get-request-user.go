@@ -1,4 +1,4 @@
-package util
+package request_util
 
 import (
 	"errors"

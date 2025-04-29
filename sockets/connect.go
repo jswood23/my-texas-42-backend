@@ -8,7 +8,7 @@ import (
 	"my-texas-42-backend/games"
 	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
-	"my-texas-42-backend/util"
+	"my-texas-42-backend/request-util"
 	"net/http"
 	"strconv"
 )
@@ -31,7 +31,7 @@ func Connect(c *gin.Context) {
 	}
 	defer closeConnection(conn)
 
-	user, err := util.GetRequestUser(c)
+	user, err := request_util.GetRequestUser(c)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

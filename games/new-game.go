@@ -3,13 +3,14 @@ package games
 import (
 	"github.com/gin-gonic/gin"
 	"my-texas-42-backend/models"
+	"my-texas-42-backend/request-util"
 	"my-texas-42-backend/services"
 	"my-texas-42-backend/sql_scripts"
 	"my-texas-42-backend/util"
 )
 
 func NewGame(c *gin.Context) {
-	user, err := util.GetRequestUser(c)
+	user, err := request_util.GetRequestUser(c)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
