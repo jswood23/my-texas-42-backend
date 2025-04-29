@@ -3,7 +3,9 @@ package models
 import (
 	"errors"
 	"math/rand"
+	"my-texas-42-backend/util"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -277,4 +279,50 @@ func (game *GlobalGameState) AssignDominoes() {
 			dominoes[21:28],
 		},
 	}
+}
+
+func (game *GlobalGameState) ProcessMove(username string, moveStr string) error {
+	moveType, _, err := getMove(moveStr)
+	if err != nil {
+		return err
+	}
+
+	switch moveType {
+	case MoveTypeBid:
+		break
+	case MoveTypePlay:
+		break
+	case MoveTypeCall:
+		break
+	}
+
+	return nil
+}
+
+// getMove parses the move string and returns the move type, actual move, and an error if any, respectively
+func getMove(moveStr string) (MoveType, ActualMove, error) {
+	// validate that there is exactly one forward slash
+	if strings.Count(moveStr, "/") != 1 {
+		return "", "", errors.New("invalid move format")
+	}
+
+	// split the move string by forward slash
+	parts := strings.Split(moveStr, "/")
+	if len(parts) != 2 {
+		return "", "", errors.New("invalid move format")
+	}
+
+	moveType := strings.TrimSpace(parts[0])
+	actualMove := strings.TrimSpace(parts[1])
+	if moveType == "" || actualMove == "" {
+		return "", "", errors.New("invalid move format")
+	}
+
+	// validate that the move type is one of the allowed types
+	allowedMoveTypes := []string{"bid", "play", "call"}
+	if !util.StringSliceContains(allowedMoveTypes, moveType) {
+		return "", "", errors.New("invalid move type")
+	}
+
+	return MoveType(moveType), ActualMove(actualMove), nil
 }

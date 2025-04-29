@@ -107,17 +107,9 @@ func (cm *ConnectionManager) handleIncomingMessages(username string) {
 		}
 
 		if result.Action == "send_chat_message" {
-			var data models.WSSendChatMessageAPIModel
-			err = json.Unmarshal([]byte(result.Data), &data)
-
-			if err != nil {
-				logger.Error("Failed to unmarshal chat message data: " + err.Error() + "\n" + result.Data)
-				continue
-			}
-
-			handleChatMessage(cm, username, data)
+			handleChatMessage(cm, username, result.Data)
 		} else if result.Action == "play_turn" {
-			println("play turn")
+			processMove(cm, username, result.Data)
 		} else if result.Action == "refresh_player_game_state" {
 			refreshGameStateForPlayer(cm, username)
 		} else if result.Action == "switch_teams" {

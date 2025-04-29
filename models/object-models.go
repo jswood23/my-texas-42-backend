@@ -108,3 +108,13 @@ type GlobalGameState struct {
 }
 
 type GameMap map[InviteCode]*GlobalGameState
+
+type MoveType string
+
+const (
+	MoveTypeBid  MoveType = "bid"
+	MoveTypePlay MoveType = "play"
+	MoveTypeCall MoveType = "call"
+)
+
+type ActualMove string

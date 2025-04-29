@@ -1,8 +1,10 @@
 package sockets
 
 import (
+	"encoding/json"
 	"errors"
 	"my-texas-42-backend/games"
+	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/services"
 	"my-texas-42-backend/sql_scripts"
@@ -12,10 +14,18 @@ import (
 
 const chatMessageMaxLength = 255
 
-// invalid characters: ;, ', ", \n
+// invalid characters: ; ' " \n
 const invalidCharactersRegex = `[;'"\n]`
 
-func handleChatMessage(cm *ConnectionManager, username string, data models.WSSendChatMessageAPIModel) {
+func handleChatMessage(cm *ConnectionManager, username string, resultData string) {
+	var data models.WSSendChatMessageAPIModel
+	err := json.Unmarshal([]byte(resultData), &data)
+
+	if err != nil {
+		logger.Error("Failed to unmarshal chat message data: " + err.Error() + "\n" + resultData)
+		return
+	}
+
 	game, err := games.GetGameManager().GetGameByUsername(username)
 	if err != nil {
 		sendErrorToPlayer(username, "Failed to get game: "+err.Error())
