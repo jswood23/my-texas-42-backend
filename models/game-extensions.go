@@ -282,13 +282,19 @@ func (game *GlobalGameState) AssignDominoes() {
 }
 
 func (game *GlobalGameState) ProcessMove(username string, moveStr string) error {
-	moveType, _, err := getMove(moveStr)
+	err := game.validateTurn(username)
+	if err != nil {
+		return err
+	}
+
+	moveType, move, err := getMove(moveStr)
 	if err != nil {
 		return err
 	}
 
 	switch moveType {
 	case MoveTypeBid:
+		game.validateBid(move)
 		break
 	case MoveTypePlay:
 		break
