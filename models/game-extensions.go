@@ -31,22 +31,13 @@ const (
 )
 
 func (game *GlobalGameState) ContainsPlayer(username string) bool {
-	isInTeam1, _ := teamContains(game.Team1UserNames, username)
-	isInTeam2, _ := teamContains(game.Team2UserNames, username)
+	isInTeam1, _ := util.StringSliceContainsWithIndex(game.Team1UserNames, username)
+	isInTeam2, _ := util.StringSliceContainsWithIndex(game.Team2UserNames, username)
 	return isInTeam1 || isInTeam2
 }
 
-func teamContains(slice []string, item string) (bool, int) {
-	for i, v := range slice {
-		if v == item {
-			return true, i
-		}
-	}
-	return false, -1
-}
-
 func (game *GlobalGameState) ConnectDisconnectedPlayer(username string) {
-	isInTeam1, _ := teamContains(game.Team1UserNames, username)
+	isInTeam1, _ := util.StringSliceContainsWithIndex(game.Team1UserNames, username)
 	if isInTeam1 {
 		for i, player := range game.Team1UserNames {
 			if player == username {
@@ -56,7 +47,7 @@ func (game *GlobalGameState) ConnectDisconnectedPlayer(username string) {
 		}
 	}
 
-	isInTeam2, _ := teamContains(game.Team2UserNames, username)
+	isInTeam2, _ := util.StringSliceContainsWithIndex(game.Team2UserNames, username)
 	if isInTeam2 {
 		for i, player := range game.Team2UserNames {
 			if player == username {
@@ -68,7 +59,7 @@ func (game *GlobalGameState) ConnectDisconnectedPlayer(username string) {
 }
 
 func (game *GlobalGameState) SetPlayerAsDisconnected(username string) {
-	isInTeam1, _ := teamContains(game.Team1UserNames, username)
+	isInTeam1, _ := util.StringSliceContainsWithIndex(game.Team1UserNames, username)
 	if isInTeam1 {
 		for i, player := range game.Team1UserNames {
 			if player == username {
@@ -78,7 +69,7 @@ func (game *GlobalGameState) SetPlayerAsDisconnected(username string) {
 		}
 	}
 
-	isInTeam2, _ := teamContains(game.Team2UserNames, username)
+	isInTeam2, _ := util.StringSliceContainsWithIndex(game.Team2UserNames, username)
 	if isInTeam2 {
 		for i, player := range game.Team2UserNames {
 			if player == username {
@@ -110,7 +101,7 @@ func (game *GlobalGameState) AddPlayer(username string, teamNumber int) error {
 }
 
 func (game *GlobalGameState) GetPlayerGameState(username string) *PlayerGameState {
-	isInTeam1, i := teamContains(game.Team1UserNames, username)
+	isInTeam1, i := util.StringSliceContainsWithIndex(game.Team1UserNames, username)
 	if isInTeam1 {
 		return &PlayerGameState{
 			GameState:      game.GameState,
@@ -119,7 +110,7 @@ func (game *GlobalGameState) GetPlayerGameState(username string) *PlayerGameStat
 		}
 	}
 
-	isInTeam2, i := teamContains(game.Team2UserNames, username)
+	isInTeam2, i := util.StringSliceContainsWithIndex(game.Team2UserNames, username)
 	if isInTeam2 {
 		return &PlayerGameState{
 			GameState:      game.GameState,
@@ -154,7 +145,7 @@ func (game *GlobalGameState) GetAllConnectedUsernames() []string {
 }
 
 func (game *GlobalGameState) SwitchPlayerTeam(username string) error {
-	isInTeam1, i := teamContains(game.Team1UserNames, username)
+	isInTeam1, i := util.StringSliceContainsWithIndex(game.Team1UserNames, username)
 	if isInTeam1 {
 		if len(game.Team2UserNames) >= 2 {
 			return errors.New("team 2 is full")
@@ -171,7 +162,7 @@ func (game *GlobalGameState) SwitchPlayerTeam(username string) error {
 		return nil
 	}
 
-	isInTeam2, i := teamContains(game.Team2UserNames, username)
+	isInTeam2, i := util.StringSliceContainsWithIndex(game.Team2UserNames, username)
 	if !isInTeam2 {
 		return errors.New("player not in any team")
 	}
@@ -282,6 +273,11 @@ func (game *GlobalGameState) AssignDominoes() {
 }
 
 func (game *GlobalGameState) ProcessMove(username string, moveStr string) error {
+	err := game.validateTurn(username)
+	if err != nil {
+		return err
+	}
+
 	moveType, _, err := getMove(moveStr)
 	if err != nil {
 		return err
