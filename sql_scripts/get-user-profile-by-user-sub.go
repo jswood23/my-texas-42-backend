@@ -14,3 +14,12 @@ WHERE Username = '%s'
 AND UserSub = '%s';
 `, sanitizedUsername, sanitizedUserSub)
 }
+
+func GetUserByUserSub(userSub string) string {
+	sanitizedUserSub := util.Sanitize(userSub)
+
+	return fmt.Sprintf(`
+SELECT * FROM public.Users
+WHERE UserSub = '%s';
+`, sanitizedUserSub)
+}

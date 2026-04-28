@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 	"github.com/gin-gonic/gin"
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/services"
@@ -69,7 +70,26 @@ func authenticateWithAuthToken(c *gin.Context, abortIfNotAuthenticated bool) boo
 		return false
 	}
 
-	query := sql_scripts.GetUserProfileByUsername(*authResult.Username)
+	var subAttr, emailVerifiedAttr, emailAttr *cognitoidentityprovider.AttributeType
+	for _, attr := range authResult.UserAttributes {
+		switch *attr.Name {
+		case "sub":
+			subAttr = attr
+		case "email_verified":
+			emailVerifiedAttr = attr
+		case "email":
+			emailAttr = attr
+		}
+	}
+
+	if subAttr == nil {
+		if abortIfNotAuthenticated {
+			c.AbortWithStatusJSON(500, gin.H{"error": "User sub not found in token."})
+		}
+		return false
+	}
+
+	query := sql_scripts.GetUserByUserSub(*subAttr.Value)
 	result, err := services.Query[models.UserModel](query)
 	if err != nil || len(result) == 0 {
 		if abortIfNotAuthenticated {
@@ -79,9 +99,9 @@ func authenticateWithAuthToken(c *gin.Context, abortIfNotAuthenticated bool) boo
 	}
 
 	c.Set("user", result[0])
-	c.Set("sub", authResult.UserAttributes[0])
-	c.Set("emailVerified", authResult.UserAttributes[1])
-	c.Set("email", authResult.UserAttributes[2])
+	c.Set("sub", subAttr)
+	c.Set("emailVerified", emailVerifiedAttr)
+	c.Set("email", emailAttr)
 
 	return true
 }
