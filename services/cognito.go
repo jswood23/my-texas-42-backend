@@ -24,7 +24,7 @@ func LoginCognito(username string, password string) (*cognitoidentityprovider.Au
 
 	output, err := provider.InitiateAuth(input)
 	if err != nil {
-		return nil, fmt.Errorf("LoginCognito error: %v", err)
+		return nil, err
 	}
 
 	if output.AuthenticationResult == nil {
@@ -34,7 +34,7 @@ func LoginCognito(username string, password string) (*cognitoidentityprovider.Au
 	return output.AuthenticationResult, nil
 }
 
-func SignUpCognito(email string, username string, password string) error {
+func SignUpCognito(email string, username string, password string) (string, error) {
 	provider := getCognitoProvider()
 
 	input := &cognitoidentityprovider.SignUpInput{
@@ -49,12 +49,12 @@ func SignUpCognito(email string, username string, password string) error {
 		},
 	}
 
-	_, err := provider.SignUp(input)
+	output, err := provider.SignUp(input)
 	if err != nil {
-		return fmt.Errorf("SignUpCognito error: %v", err)
+		return "", err
 	}
 
-	return nil
+	return *output.UserSub, nil
 }
 
 func ConfirmSignUpCognito(username string, confirmationCode string) (*cognitoidentityprovider.ConfirmSignUpOutput, error) {
@@ -68,10 +68,26 @@ func ConfirmSignUpCognito(username string, confirmationCode string) (*cognitoide
 
 	result, err := provider.ConfirmSignUp(input)
 	if err != nil {
-		return nil, fmt.Errorf("ConfirmSignUpCognito error: %v", err)
+		return nil, err
 	}
 
 	return result, nil
+}
+
+func ResendConfirmationCodeCognito(username string) error {
+	provider := getCognitoProvider()
+
+	input := &cognitoidentityprovider.ResendConfirmationCodeInput{
+		ClientId: aws.String(system.GetUserPoolAppKey()),
+		Username: aws.String(username),
+	}
+
+	_, err := provider.ResendConfirmationCode(input)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func ChangePasswordCognito(accessToken string, oldPassword string, newPassword string) error {
@@ -85,7 +101,7 @@ func ChangePasswordCognito(accessToken string, oldPassword string, newPassword s
 
 	_, err := provider.ChangePassword(input)
 	if err != nil {
-		return fmt.Errorf("ChangePasswordCognito error: %v", err)
+		return err
 	}
 
 	return nil
@@ -101,7 +117,7 @@ func AuthenticateRequest(accessToken string) (*cognitoidentityprovider.GetUserOu
 	output, err := provider.GetUser(input)
 
 	if err != nil {
-		return nil, fmt.Errorf("authentication error: %v", err)
+		return nil, err
 	}
 
 	return output, nil

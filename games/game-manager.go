@@ -27,34 +27,48 @@ func (gm *GameManager) GetAllGames() models.GameMap {
 	return gm.games
 }
 
-func (gm *GameManager) CreateNewGame(matchName string, matchPrivacy models.PrivacyLevel, rules []string, ownerUsername string) *models.GlobalGameState {
+func (gm *GameManager) CreateNewGame(matchId int, matchName string, matchPrivacy models.PrivacyLevel, rules []string, ownerUsername string) *models.GlobalGameState {
+	// Generate a match invite code that doesn't already exist
+	var matchInviteCode models.InviteCode
+	for {
+		matchInviteCode = models.InviteCode(util.GenerateInviteCode())
+		if _, exists := gm.games[matchInviteCode]; !exists {
+			break
+		}
+	}
+
 	game := &models.GlobalGameState{
 		GameState: models.GameState{
-			MatchInviteCode:        util.GenerateInviteCode(),
-			MatchName:              matchName,
-			MatchPrivacy:           matchPrivacy,
-			Rules:                  rules,
-			OwnerUsername:          ownerUsername,
-			Team1UserNames:         []string{ownerUsername},
-			Team2UserNames:         make([]string, 0),
-			IsConnected:            []bool{false},
-			CurrentRound:           0,
-			CurrentStartingBidder:  0,
-			CurrentStartingPlayer:  0,
-			CurrentIsBidding:       false,
-			CurrentPlayerTurn:      0,
-			CurrentRoundRules:      nil,
-			CurrentTeam1RoundScore: 0,
-			CurrentTeam2RoundScore: 0,
+			MatchInviteCode:       matchInviteCode,
+			MatchName:             matchName,
+			MatchPrivacy:          matchPrivacy,
+			Rules:                 rules,
+			OwnerUsername:         ownerUsername,
+			Team1UserNames:        []string{ownerUsername},
+			Team2UserNames:        make([]string, 0),
+			Team1Connected:        []bool{false},
+			Team2Connected:        make([]bool, 0),
+			CurrentRound:          0,
+			CurrentStartingBidder: 0,
+			CurrentStartingPlayer: 0,
+			IsInBidding:           false,
+			CurrentPlayerTurn:     0,
+			RoundRules: models.RoundRules{
+				Bid:         0,
+				BiddingTeam: 0,
+				Trump:       models.RuleUndecided,
+				Variant:     models.RuleNoVariant,
+			},
+			Team1RoundScore:        0,
+			Team2RoundScore:        0,
 			CurrentTeam1TotalScore: 0,
 			CurrentTeam2TotalScore: 0,
-			CurrentRoundHistory:    make([]string, 0),
+			RoundHistory:           make([]string, 0),
 			TotalRoundHistory:      make([]string, 0),
 		},
 		HasStarted:        false,
-		AllPlayerDominoes: make([]models.DominoName, 0),
-		Team1PlayerIDs:    make([]models.UserID, 0),
-		Team2PlayerIDs:    make([]models.UserID, 0),
+		AllPlayerDominoes: [2][2][]models.DominoName{{{}, {}}, {{}, {}}},
+		MatchId:           matchId,
 	}
 
 	gm.addGame(game)
@@ -82,15 +96,15 @@ func (gm *GameManager) GetGameByInviteCode(inviteCode models.InviteCode) *models
 	return gm.games[inviteCode]
 }
 
-func (gm *GameManager) GetGameByUserID(userID models.UserID) (*models.GlobalGameState, error) {
+func (gm *GameManager) GetGameByUsername(username string) (*models.GlobalGameState, error) {
 	for _, game := range gm.games {
-		for _, playerID := range game.Team1PlayerIDs {
-			if playerID == userID {
+		for _, playerUsername := range game.GameState.Team1UserNames {
+			if playerUsername == username {
 				return game, nil
 			}
 		}
-		for _, playerID := range game.Team2PlayerIDs {
-			if playerID == userID {
+		for _, playerUsername := range game.GameState.Team2UserNames {
+			if playerUsername == username {
 				return game, nil
 			}
 		}

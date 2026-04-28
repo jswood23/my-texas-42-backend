@@ -24,6 +24,10 @@ type ConfirmSignupAPIModel struct {
 	VerificationCode string `json:"verificationcode"`
 }
 
+type ResendConfirmationCodeAPIModel struct {
+	Username string `json:"username"`
+}
+
 type ChangePasswordAPIModel struct {
 	OldPassword string `json:"oldpassword"`
 	NewPassword string `json:"newpassword"`
@@ -78,27 +82,33 @@ type OtherUserProfileAPIModel struct {
 }
 
 type WSOutgoingMessageAPIModel struct {
-	MessageType string          `json:"messagetype"`
-	Message     string          `json:"message"`
-	Username    string          `json:"username"`
-	GameData    PlayerGameState `json:"gamedata"`
+	MessageType string           `json:"message_type"`
+	Message     string           `json:"message"`
+	Username    string           `json:"username"`
+	GameData    *PlayerGameState `json:"game_data"`
 }
 
 type WSIncomingMessageAPIModel struct {
-	Action string                 `json:"action"`
-	Data   map[string]interface{} `json:"data"`
+	Action string `json:"action"`
+	Data   string `json:"data"`
 }
 
 type WSSendChatMessageAPIModel struct {
 	Message string `json:"message"`
 }
 
+const (
+	WSMessageTypeChat       = "chat"
+	WSMessageTypeGameUpdate = "game-update"
+	WSMessageTypeGameError  = "game-error"
+)
+
 type GameAPIModel struct {
 	MatchName       string     `json:"match_name"`
 	MatchInviteCode InviteCode `json:"match_invite_code"`
 	Rules           []string   `json:"rules"`
-	Team1           []string   `json:"team1"`
-	Team2           []string   `json:"team2"`
+	Team1           []string   `json:"team_1"`
+	Team2           []string   `json:"team_2"`
 }
 
 type ListGamesAPIModel struct {

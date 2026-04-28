@@ -12,6 +12,7 @@ type UserModel struct {
 	Email       string `db:"email"`
 	IsAdmin     bool   `db:"isadmin"`
 	DisplayName string `db:"displayname"`
+	UserSub     string `db:"usersub"`
 }
 
 type UserStatsModel struct {
@@ -48,7 +49,7 @@ type FriendModel struct {
 	User2ID   UserID `db:"user2id"`
 }
 
-type ConnectionMap map[UserID]*websocket.Conn
+type ConnectionMap map[string]*websocket.Conn // the string is a username
 
 type RoundRules struct {
 	Bid         int    `json:"bid"`
@@ -77,32 +78,44 @@ type GameState struct {
 	OwnerUsername          string       `json:"owner_username"`
 	Team1UserNames         []string     `json:"team_1"`
 	Team2UserNames         []string     `json:"team_2"`
-	IsConnected            []bool       `json:"is_connected"`
+	Team1Connected         []bool       `json:"team_1_connected"`
+	Team2Connected         []bool       `json:"team_2_connected"`
 	CurrentRound           int          `json:"current_round"`
 	CurrentStartingBidder  int          `json:"current_starting_bidder"`
 	CurrentStartingPlayer  int          `json:"current_starting_player"`
-	CurrentIsBidding       bool         `json:"current_is_bidding"`
+	IsInBidding            bool         `json:"current_is_bidding"`
 	CurrentPlayerTurn      int          `json:"current_player_turn"`
-	CurrentRoundRules      interface{}  `json:"current_round_rules"`
-	CurrentTeam1RoundScore int          `json:"current_team_1_round_score"`
-	CurrentTeam2RoundScore int          `json:"current_team_2_round_score"`
+	RoundRules             RoundRules   `json:"current_round_rules"`
+	Team1RoundScore        int          `json:"current_team_1_round_score"`
+	Team2RoundScore        int          `json:"current_team_2_round_score"`
 	CurrentTeam1TotalScore int          `json:"current_team_1_total_score"`
 	CurrentTeam2TotalScore int          `json:"current_team_2_total_score"`
-	CurrentRoundHistory    []string     `json:"current_round_history"`
+	RoundHistory           []string     `json:"current_round_history"`
 	TotalRoundHistory      []string     `json:"total_round_history"`
+	MatchWinningTeam       int          `json:"match_winning_team"`
 }
 
 type PlayerGameState struct {
 	GameState
 	PlayerDominoes []DominoName `json:"player_dominoes"`
+	HasStarted     bool         `json:"has_started"`
 }
 
 type GlobalGameState struct {
 	GameState
 	HasStarted        bool
-	AllPlayerDominoes []DominoName
-	Team1PlayerIDs    []UserID
-	Team2PlayerIDs    []UserID
+	AllPlayerDominoes [2][2][]DominoName
+	MatchId           int
 }
 
 type GameMap map[InviteCode]*GlobalGameState
+
+type MoveType string
+
+const (
+	MoveTypeBid  MoveType = "bid"
+	MoveTypePlay MoveType = "play"
+	MoveTypeCall MoveType = "call"
+)
+
+type ActualMove string
