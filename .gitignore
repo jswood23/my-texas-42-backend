@@ -22,6 +22,7 @@ go.work
 
 .env
 
-# Jetbrains IDE files
+# IDE files
 .idea/
 .run
+.vscode/

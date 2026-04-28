@@ -34,7 +34,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	err = services.SignUpCognito(request.Email, request.Username, request.Password)
+	userSub, err := services.SignUpCognito(request.Email, request.Username, request.Password)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"message": "Failed to create user auth.",
@@ -42,7 +42,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	query := sql_scripts.NewUser(request.Email, request.Username)
+	query := sql_scripts.NewUser(request.Email, request.Username, userSub)
 	err = services.Execute(query)
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -70,11 +70,35 @@ func ConfirmSignup(c *gin.Context) {
 	if err != nil {
 		c.JSON(400, gin.H{
 			"message": "Failed to confirm user.",
+			"reason":  err.Error(),
 		})
 		return
 	}
 
 	c.JSON(200, gin.H{
 		"message": "User confirmed.",
+	})
+}
+
+func ResendConfirmation(c *gin.Context) {
+	request, err := models.DecodeAPIModel[models.ResendConfirmationCodeAPIModel](c.Request.Body)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "Invalid request body.",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
+	err = services.ResendConfirmationCodeCognito(request.Username)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "Failed to resend confirmation code.",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Confirmation code resent.",
 	})
 }

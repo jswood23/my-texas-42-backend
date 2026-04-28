@@ -3,6 +3,7 @@ package games
 import (
 	"github.com/gin-gonic/gin"
 	"my-texas-42-backend/models"
+	"my-texas-42-backend/request-util"
 	"my-texas-42-backend/services"
 	"my-texas-42-backend/sql_scripts"
 	"my-texas-42-backend/util"
@@ -13,7 +14,7 @@ type friendRow struct {
 }
 
 func ListGames(c *gin.Context) {
-	user, err := util.GetRequestUser(c)
+	user, err := request_util.GetRequestUser(c)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
@@ -53,7 +54,7 @@ func ListGames(c *gin.Context) {
 
 		if game.GameState.MatchPrivacy == models.PrivacyPublic {
 			addToGameList(&respBody.PublicGames, game)
-		} else if game.GameState.MatchPrivacy == models.PrivacyFriends && util.SliceContains(friendUsernames, game.GameState.OwnerUsername) {
+		} else if game.GameState.MatchPrivacy == models.PrivacyFriends && util.StringSliceContains(friendUsernames, game.GameState.OwnerUsername) {
 			addToGameList(&respBody.PrivateGames, game)
 		}
 	}
@@ -65,11 +66,11 @@ func findUserCurrentGame(username string) models.InviteCode {
 	games := GetGameManager().GetAllGames()
 
 	for _, game := range games {
-		if util.SliceContains(game.GameState.Team1UserNames, username) {
+		if util.StringSliceContains(game.GameState.Team1UserNames, username) {
 			return game.GameState.MatchInviteCode
 		}
 
-		if util.SliceContains(game.GameState.Team2UserNames, username) {
+		if util.StringSliceContains(game.GameState.Team2UserNames, username) {
 			return game.GameState.MatchInviteCode
 		}
 	}

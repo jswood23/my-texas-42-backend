@@ -4,9 +4,9 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"my-texas-42-backend/models"
+	"my-texas-42-backend/request-util"
 	"my-texas-42-backend/services"
 	"my-texas-42-backend/sql_scripts"
-	"my-texas-42-backend/util"
 )
 
 type friendRow struct {
@@ -18,7 +18,7 @@ var userDoesNotExistError = errors.New("user does not exist")
 func GetUserProfile(c *gin.Context) {
 	username := c.Param("username")
 
-	currentUser, err := util.GetRequestUser(c)
+	currentUser, err := request_util.GetRequestUser(c)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Error getting username from request", "reason": err.Error()})
 		return
