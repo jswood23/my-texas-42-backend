@@ -63,6 +63,8 @@ func getRouter() *gin.Engine {
 	origins := []string{
 		"https://mytexas42.com",
 		"https://www.mytexas42.com",
+		"https://app.mytexas42.com",
+		"https://www.app.mytexas42.com",
 	}
 
 	if system.GetEnv() == "staging" {
