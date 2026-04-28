@@ -18,6 +18,3 @@ func (game *GlobalGameState) validateTurn(username string) error {
 	return nil
 }
 
-func (game *GlobalGameState) validateBid(username string, bid int) error {
-	return nil
-}

@@ -31,7 +31,7 @@ func (gm *GameManager) CreateNewGame(matchId int, matchName string, matchPrivacy
 	// Generate a match invite code that doesn't already exist
 	var matchInviteCode models.InviteCode
 	for {
-		matchInviteCode = util.GenerateInviteCode()
+		matchInviteCode = models.InviteCode(util.GenerateInviteCode())
 		if _, exists := gm.games[matchInviteCode]; !exists {
 			break
 		}

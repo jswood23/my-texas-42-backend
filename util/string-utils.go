@@ -3,7 +3,6 @@ package util
 import (
 	"errors"
 	"math/rand"
-	"my-texas-42-backend/models"
 	"regexp"
 	"strings"
 )
@@ -63,17 +62,17 @@ func IsEmailValid(email string) bool {
 }
 
 // IsDominoNameValid checks if the domino name is in the correct format (e.g. "0-0")
-func IsDominoNameValid(d models.DominoName) bool {
-	return regexp.MustCompile(`^[0-6]-[0-6]$`).MatchString(string(d))
+func IsDominoNameValid(d string) bool {
+	return regexp.MustCompile(`^[0-6]-[0-6]$`).MatchString(d)
 }
 
 // GenerateInviteCode generates a random 6 character string with all uppercase letters
-func GenerateInviteCode() models.InviteCode {
+func GenerateInviteCode() string {
 	inviteCode := make([]byte, 6)
 	for i := range inviteCode {
 		inviteCode[i] = 'A' + byte(rand.Intn(26))
 	}
-	return models.InviteCode(inviteCode)
+	return string(inviteCode)
 }
 
 // IsInviteCodeValid checks if the invite code has 6 characters and is all uppercase letters
@@ -81,11 +80,11 @@ func IsInviteCodeValid(inviteCode string) bool {
 	return regexp.MustCompile(`^[A-Z]{6}$`).MatchString(inviteCode)
 }
 
-func ValidatePrivacyLevel(privacyLevel string) (models.PrivacyLevel, error) {
-	validPrivacyLevels := []models.PrivacyLevel{models.PrivacyPublic, models.PrivacyPrivate, models.PrivacyFriends}
+func ValidatePrivacyLevel(privacyLevel string) (string, error) {
+	validPrivacyLevels := []string{"public", "private", "friends"}
 
 	for _, validPrivacyLevel := range validPrivacyLevels {
-		if privacyLevel == string(validPrivacyLevel) {
+		if privacyLevel == validPrivacyLevel {
 			return validPrivacyLevel, nil
 		}
 	}

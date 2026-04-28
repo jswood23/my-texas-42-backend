@@ -92,6 +92,7 @@ type GameState struct {
 	CurrentTeam2TotalScore int          `json:"current_team_2_total_score"`
 	RoundHistory           []string     `json:"current_round_history"`
 	TotalRoundHistory      []string     `json:"total_round_history"`
+	MatchWinningTeam       int          `json:"match_winning_team"`
 }
 
 type PlayerGameState struct {

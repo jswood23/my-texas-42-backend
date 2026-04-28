@@ -250,7 +250,7 @@ func (game *GlobalGameState) AssignDominoes() {
 	dominoes := make([]DominoName, 0, 28)
 	for i := 0; i <= 6; i++ {
 		for j := i; j <= 6; j++ {
-			dominoes = append(dominoes, DominoName(strconv.Itoa(j)+":"+strconv.Itoa(i)))
+			dominoes = append(dominoes, DominoName(strconv.Itoa(j)+"-"+strconv.Itoa(i)))
 		}
 	}
 
@@ -273,26 +273,79 @@ func (game *GlobalGameState) AssignDominoes() {
 }
 
 func (game *GlobalGameState) ProcessMove(username string, moveStr string) error {
-	err := game.validateTurn(username)
+	if game.MatchWinningTeam != 0 {
+		return errors.New("the match has ended")
+	}
+	if !game.HasStarted {
+		return errors.New("the match has not started")
+	}
+
+	if err := game.validateTurn(username); err != nil {
+		return err
+	}
+
+	moveType, actualMove, err := getMove(moveStr)
 	if err != nil {
 		return err
 	}
 
-	moveType, _, err := getMove(moveStr)
-	if err != nil {
-		return err
+	// Phase / move-type alignment + per-phase validation.
+	switch {
+	case game.IsInBidding:
+		if moveType != MoveTypeBid {
+			return errors.New("you need to make a bid")
+		}
+		if err := game.validateBid(string(actualMove)); err != nil {
+			return err
+		}
+	case game.isCalling():
+		if moveType != MoveTypeCall {
+			return errors.New("you need to call the rules of the round")
+		}
+		if err := game.validateCall(string(actualMove)); err != nil {
+			return err
+		}
+	case game.isPlaying():
+		if moveType != MoveTypePlay {
+			return errors.New("you need to play a domino")
+		}
+		if err := game.validatePlay(string(actualMove)); err != nil {
+			return err
+		}
+	default:
+		return errors.New("invalid game phase")
 	}
 
-	switch moveType {
-	case MoveTypeBid:
-		break
-	case MoveTypePlay:
-		break
-	case MoveTypeCall:
-		break
+	// All validation passed — mutate state. Mirrors legacy play-turn handler.
+	game.RoundHistory = append(game.RoundHistory,
+		formatHistoryEntry(username, string(moveType), string(actualMove)))
+
+	if game.isPlaying() {
+		game.applyPlay(string(actualMove))
+	}
+
+	game.CurrentPlayerTurn = (game.CurrentPlayerTurn + 1) % 4
+	game.skipPlayerTurnIfNil()
+
+	if game.isCalling() {
+		game.applyCall(string(actualMove))
+	} else if game.CurrentPlayerTurn == game.CurrentStartingPlayer {
+		game.processEndOfTrick()
 	}
 
 	return nil
+}
+
+// skipPlayerTurnIfNil advances the turn past the Nil bidder's partner, who sits out.
+// Mirrors legacy skipPlayerTurnIfNil.
+func (game *GlobalGameState) skipPlayerTurnIfNil() {
+	if game.RoundRules.Variant != RuleNil {
+		return
+	}
+	nilBidder := game.getNilBiddingPlayer()
+	if (game.CurrentPlayerTurn+2)%4 == nilBidder {
+		game.CurrentPlayerTurn = (game.CurrentPlayerTurn + 1) % 4
+	}
 }
 
 // getMove parses the move string and returns the move type, actual move, and an error if any, respectively

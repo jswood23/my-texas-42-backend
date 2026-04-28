@@ -30,7 +30,12 @@ func NewGame(c *gin.Context) {
 		return
 	}
 
-	privacyLevel, err := util.ValidatePrivacyLevel(request.Privacy)
+	privacyLevelStr, err := util.ValidatePrivacyLevel(request.Privacy)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	privacyLevel := models.PrivacyLevel(privacyLevelStr)
 
 	type matchIdResponse struct {
 		MatchId int `db:"matchid"`
