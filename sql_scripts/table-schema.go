@@ -4,13 +4,14 @@ func TableSchema() string {
 	return `
 create table if not exists public.Users
 (
-    UserID         serial
+    UserID      serial
         constraint Users_pk
             primary key,
-    Username       varchar(26) not null,
-    Email          varchar(31) not null,
-    IsAdmin        boolean,
-    displayname varchar(26)
+    Username    varchar(26)  not null,
+    Email       varchar(31)  not null,
+    IsAdmin     boolean,
+    DisplayName varchar(26),
+    UserSub     varchar(40) not null
 );
 
 create table if not exists public.Friends
