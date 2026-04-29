@@ -2,6 +2,7 @@ package friends
 
 import (
 	"github.com/gin-gonic/gin"
+	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/request-util"
 	"my-texas-42-backend/services"
@@ -13,6 +14,7 @@ func AcceptFriendRequest(c *gin.Context) {
 
 	user, err := request_util.GetRequestUser(c)
 	if err != nil {
+		logger.Error("Error getting request user: " + err.Error())
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -35,6 +37,7 @@ func AcceptFriendRequest(c *gin.Context) {
 	query = sql_scripts.CheckForExistingFriend(senderUsername, user.Username)
 	friendRows, err := services.Query[models.FriendModel](query)
 	if err != nil {
+		logger.Error("Error checking for existing friend: " + err.Error())
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -47,6 +50,7 @@ func AcceptFriendRequest(c *gin.Context) {
 	query = sql_scripts.CheckForExistingFriendRequest(senderUsername, user.Username)
 	friendRequestRows, err := services.Query[models.FriendRequestModel](query)
 	if err != nil {
+		logger.Error("Error checking for existing friend request: " + err.Error())
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -58,6 +62,7 @@ func AcceptFriendRequest(c *gin.Context) {
 	query = sql_scripts.RemoveFriendRequest(senderUsername, user.Username)
 	err = services.Execute(query)
 	if err != nil {
+		logger.Error("Error removing friend request: " + err.Error())
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -65,6 +70,7 @@ func AcceptFriendRequest(c *gin.Context) {
 	query = sql_scripts.NewFriend(senderUsername, user.Username)
 	err = services.Execute(query)
 	if err != nil {
+		logger.Error("Error creating friend: " + err.Error())
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}

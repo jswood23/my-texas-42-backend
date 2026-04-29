@@ -2,12 +2,14 @@ package auth
 
 import (
 	"github.com/gin-gonic/gin"
+	"my-texas-42-backend/logger"
 	"my-texas-42-backend/request-util"
 )
 
 func CheckAdminUser(c *gin.Context) {
 	user, err := request_util.GetRequestUser(c)
 	if err != nil {
+		logger.Error("Error getting request user: " + err.Error())
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}

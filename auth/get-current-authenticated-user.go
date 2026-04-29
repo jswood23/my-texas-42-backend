@@ -3,6 +3,7 @@ package auth
 import (
 	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 	"github.com/gin-gonic/gin"
+	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/request-util"
 )
@@ -28,12 +29,14 @@ func GetCurrentUser(c *gin.Context) {
 
 	user, err := request_util.GetRequestUser(c)
 	if err != nil {
+		logger.Error("Error getting request user: " + err.Error())
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
 	verified, exists := c.Get("emailVerified")
 	if !exists {
+		logger.Error("emailVerified not found in context")
 		c.JSON(500, gin.H{"error": "emailVerified not found in context"})
 		return
 	}
@@ -42,6 +45,7 @@ func GetCurrentUser(c *gin.Context) {
 
 	sub, exists := c.Get("sub")
 	if !exists {
+		logger.Error("sub not found in context")
 		c.JSON(500, gin.H{"error": "sub not found in context"})
 		return
 	}
