@@ -3,6 +3,7 @@ package auth
 import (
 	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 	"github.com/gin-gonic/gin"
+	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/services"
 	"my-texas-42-backend/sql_scripts"
@@ -15,6 +16,7 @@ func Authenticate(c *gin.Context) {
 	pattern := `^/ws\?`
 	matched, err := regexp.MatchString(pattern, requestPath)
 	if err != nil {
+		logger.Error("Error checking request path pattern: " + err.Error())
 		c.AbortWithStatusJSON(500, gin.H{"error": "Error checking request path pattern"})
 		return
 	}
@@ -84,6 +86,7 @@ func authenticateWithAuthToken(c *gin.Context, abortIfNotAuthenticated bool) boo
 
 	if subAttr == nil {
 		if abortIfNotAuthenticated {
+			logger.Error("User sub not found in token")
 			c.AbortWithStatusJSON(500, gin.H{"error": "User sub not found in token."})
 		}
 		return false
@@ -93,6 +96,11 @@ func authenticateWithAuthToken(c *gin.Context, abortIfNotAuthenticated bool) boo
 	result, err := services.Query[models.UserModel](query)
 	if err != nil || len(result) == 0 {
 		if abortIfNotAuthenticated {
+			errMsg := "User data was not found"
+			if err != nil {
+				errMsg += ": " + err.Error()
+			}
+			logger.Error(errMsg)
 			c.AbortWithStatusJSON(500, gin.H{"error": "User data was not found."})
 		}
 		return false

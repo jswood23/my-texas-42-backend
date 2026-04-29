@@ -1,11 +1,13 @@
 package users
 
 import (
-	"github.com/gin-gonic/gin"
+	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/services"
 	"my-texas-42-backend/sql_scripts"
 	"my-texas-42-backend/util"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Signup(c *gin.Context) {
@@ -36,6 +38,7 @@ func Signup(c *gin.Context) {
 
 	userSub, err := services.SignUpCognito(request.Email, request.Username, request.Password)
 	if err != nil {
+		logger.Error("Failed to create user auth for " + request.Username + ": " + err.Error())
 		c.JSON(500, gin.H{
 			"message": "Failed to create user auth.",
 		})
@@ -45,6 +48,7 @@ func Signup(c *gin.Context) {
 	query := sql_scripts.NewUser(request.Email, request.Username, userSub)
 	err = services.Execute(query)
 	if err != nil {
+		logger.Error("Failed to create user data for " + request.Username + ": " + err.Error())
 		c.JSON(500, gin.H{
 			"message": "Failed to create user data.",
 		})

@@ -2,6 +2,7 @@ package games
 
 import (
 	"github.com/gin-gonic/gin"
+	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/request-util"
 	"my-texas-42-backend/services"
@@ -37,6 +38,7 @@ func ListGames(c *gin.Context) {
 	query := sql_scripts.GetUserFriends(user.Username)
 	friendResult, err := services.Query[friendRow](query)
 	if err != nil {
+		logger.Error("Error getting user's friends: " + err.Error())
 		c.JSON(500, gin.H{"error": `Error getting user's friends: ` + err.Error()})
 		return
 	}
