@@ -2,6 +2,7 @@ package users
 
 import (
 	"github.com/gin-gonic/gin"
+	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/request-util"
 	"my-texas-42-backend/services"
@@ -23,6 +24,7 @@ func ChangeDisplayName(c *gin.Context) {
 
 	user, err := request_util.GetRequestUser(c)
 	if err != nil {
+		logger.Error("Error getting request user: " + err.Error())
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -30,6 +32,7 @@ func ChangeDisplayName(c *gin.Context) {
 	query := sql_scripts.ChangeDisplayName(request.NewDisplayName, user.Username)
 	err = services.Execute(query)
 	if err != nil {
+		logger.Error("Error changing display name: " + err.Error())
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}

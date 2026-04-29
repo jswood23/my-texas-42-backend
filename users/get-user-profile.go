@@ -3,6 +3,7 @@ package users
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/request-util"
 	"my-texas-42-backend/services"
@@ -20,6 +21,7 @@ func GetUserProfile(c *gin.Context) {
 
 	currentUser, err := request_util.GetRequestUser(c)
 	if err != nil {
+		logger.Error("Error getting request user: " + err.Error())
 		c.JSON(500, gin.H{"error": "Error getting username from request", "reason": err.Error()})
 		return
 	}
@@ -27,6 +29,7 @@ func GetUserProfile(c *gin.Context) {
 	if username == currentUser.Username {
 		userProfile, err := GetCurrentUserProfile(currentUser.Username)
 		if err != nil {
+			logger.Error("Error getting current user profile for " + currentUser.Username + ": " + err.Error())
 			c.JSON(500, gin.H{"error": "Error getting user profile", "reason": err.Error()})
 			return
 		}
@@ -39,6 +42,7 @@ func GetUserProfile(c *gin.Context) {
 				c.JSON(404, gin.H{"error": err.Error()})
 				return
 			}
+			logger.Error("Error getting user profile for " + username + ": " + err.Error())
 			c.JSON(500, gin.H{"error": "Error getting user profile", "reason": err.Error()})
 			return
 		}

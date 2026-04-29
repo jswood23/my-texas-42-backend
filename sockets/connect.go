@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"log"
 	"my-texas-42-backend/games"
 	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
@@ -25,7 +24,7 @@ var upgrader = websocket.Upgrader{
 func Connect(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		log.Printf("Failed to upgrade connection to websocket: %v", err)
+		logger.Error("Failed to upgrade connection to websocket: " + err.Error())
 		c.JSON(500, gin.H{"error": "Failed to upgrade connection to websocket"})
 		return
 	}
@@ -33,6 +32,7 @@ func Connect(c *gin.Context) {
 
 	user, err := request_util.GetRequestUser(c)
 	if err != nil {
+		logger.Error("Error getting request user: " + err.Error())
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}

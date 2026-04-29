@@ -2,6 +2,7 @@ package games
 
 import (
 	"github.com/gin-gonic/gin"
+	"my-texas-42-backend/logger"
 	"my-texas-42-backend/models"
 	"my-texas-42-backend/request-util"
 	"my-texas-42-backend/services"
@@ -51,10 +52,12 @@ func NewGame(c *gin.Context) {
 	query := sql_scripts.NewMatch(request.MatchName, string(privacyLevel), rulesString, user.Username)
 	response, err := services.Query[matchIdResponse](query)
 	if err != nil {
+		logger.Error("Error creating match: " + err.Error())
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 	if len(response) == 0 {
+		logger.Error("Failed to create match: no match ID returned")
 		c.JSON(500, gin.H{"error": "Failed to create match"})
 		return
 	}
